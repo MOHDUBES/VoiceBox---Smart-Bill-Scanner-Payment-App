@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceBox - Smart Bill Scanner & Payment App</title>
+    <meta name="description"
+        content="Multi-language voice-enabled bill scanner with OCR, payment integration, and QR code support">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <!-- VoiceBox App Icon -->
+    <link rel="icon" type="image/png" href="../assets/voicebox-icon.png">
+    <link rel="apple-touch-icon" href="../assets/voicebox-icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/center-content.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <rect width="40" height="40" rx="12" fill="url(#gradient1)" />
+                    <path d="M20 10 L30 20 L20 30 L10 20 Z" fill="white" opacity="0.9" />
+                    <defs>
+                        <linearGradient id="gradient1" x1="0" y1="0" x2="40" y2="40">
+                            <stop offset="0%" stop-color="#6366f1" />
+                            <stop offset="100%" stop-color="#8b5cf6" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>VoiceBox</span>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-section="scanner">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                        <circle cx="12" cy="13" r="4" />
+                    </svg>
+                    Scanner
+                </button>
+                <button class="nav-btn" data-section="history">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3h18v18H3z" />
+                        <path d="M3 9h18M9 3v18" />
+                    </svg>
+                    History
+                </button>
+                <button class="nav-btn" data-section="payment">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <path d="M2 10h20" />
+                    </svg>
+                    Payment
+                </button>
+                <button class="nav-btn" data-section="maps">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    Maps
+                </button>
+                <button class="nav-btn" data-section="account" style="margin-left: auto;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M12 1v6m0 6v6m5.196-15.805L13.41 7.05m-2.82 9.9l-3.787 3.786M23 12h-6m-6 0H1m15.804 5.196l-3.785-3.787M7.05 10.59L3.262 6.804" />
+                    </svg>
+                    Settings
+                </button>
+                <!-- Voice Test button removed per user request -->
+                <button class="nav-btn" id="logoutBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Scanner Section -->
+            <section id="scanner" class="section active">
+                <div class="section-header">
+                    <h1>Smart Bill Scanner</h1>
+                    <p>Scan bills in any language with voice support</p>
+                </div>
+
+                <!-- Language Selection -->
+                <div class="language-selector">
+                    <label for="language">Select Language:</label>
+                    <select id="language" class="select-input">
+                        <option value="en-US">English</option>
+                        <option value="hi-IN">हिंदी (Hindi)</option>
+                        <option value="ur-PK">اردو (Urdu)</option>
+                        <option value="ar-SA">العربية (Arabic)</option>
+                        <option value="es-ES">Español (Spanish)</option>
+                        <option value="fr-FR">Français (French)</option>
+                        <option value="de-DE">Deutsch (German)</option>
+                        <option value="zh-CN">中文 (Chinese)</option>
+                        <option value="ja-JP">日本語 (Japanese)</option>
+                        <option value="ko-KR">한국어 (Korean)</option>
+                    </select>
+                </div>
+
+                <!-- Scanner Interface -->
+                <div class="scanner-card">
+                    <div class="upload-area" id="uploadArea">
+                        <svg class="upload-icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        <h3>Drop your bill here or click to upload</h3>
+                        <p>Supports: JPG, PNG, PDF</p>
+                        <input type="file" id="fileInput" accept="image/*,.pdf" hidden>
+                        <button class="btn-primary" id="uploadBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                <circle cx="12" cy="13" r="4" />
+                            </svg>
+                            Take Photo / Upload
+                        </button>
+                    </div>
+
+                    <!-- Preview Area -->
+                    <div class="preview-area hidden" id="previewArea">
+                        <img id="previewImage" alt="Bill preview">
+                        <div class="preview-actions">
+                            <button class="btn-secondary" id="scanBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="M21 21l-4.35-4.35" />
+                                </svg>
+                                Scan Bill
+                            </button>
+                            <button class="btn-secondary" id="cancelBtn">Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Results Area -->
+                    <div class="results-area hidden" id="resultsArea">
+                        <div class="results-header">
+                            <h3>Scanned Content</h3>
+                            <button class="btn-icon" id="speakBtn" title="Read Aloud">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="scanned-text" id="scannedText"></div>
+
+                        <!-- Translation Options -->
+                        <div class="translation-controls"
+                            style="margin-top: 1rem; padding: 1.25rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 12px;">
+                            <label
+                                style="font-size: 0.9rem; color: #a0a0b8; margin-bottom: 0.75rem; display: block; font-weight: 600;">🌍
+                                Translate & Listen In:</label>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <select id="translateTargetScanner" class="select-input"
+                                    style="flex: 1; min-width: 150px; padding: 0.6rem; background: #1a1a2e; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;">
+                                    <option value="en-US">English</option>
+                                    <option value="hi-IN">Hindi</option>
+                                    <option value="ur-PK">Urdu</option>
+                                    <option value="ar-SA">Arabic</option>
+                                    <option value="es-ES">Spanish</option>
+                                    <option value="fr-FR">French</option>
+                                    <option value="de-DE">German</option>
+                                    <option value="ja-JP">Japanese</option>
+                                </select>
+                                <button class="btn-primary"
+                                    onclick="translateAndSpeak(document.getElementById('scannedText').textContent, document.getElementById('translateTargetScanner').value)"
+                                    style="padding: 0.6rem 1.25rem; border-radius: 8px; background: #6366f1;">
+                                    🚀 Translate & Suniye
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="results-actions">
+                            <button class="btn-primary" id="saveBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                                    <polyline points="17 21 17 13 7 13 7 21" />
+                                    <polyline points="7 3 7 8 15 8" />
+                                </svg>
+                                Save Bill
+                            </button>
+                            <button class="btn-secondary" id="newScanBtn">New Scan</button>
+                        </div>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div class="loading hidden" id="loading">
+                        <div class="spinner"></div>
+                        <p>Processing your bill...</p>
+                    </div>
+                </div>
+
+                <!-- Voice Input -->
+                <div class="voice-card">
+                    <button class="voice-btn" id="voiceBtn">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                            <line x1="12" y1="19" x2="12" y2="23" />
+                            <line x1="8" y1="23" x2="16" y2="23" />
+                        </svg>
+                    </button>
+                    <div class="voice-text">
+                        <p id="voiceStatus">Tap to speak</p>
+                        <span id="voiceTranscript"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="history" class="section">
+                <div class="section-header">
+                    <h1>History</h1>
+                    <p>View bills and payment transactions</p>
+                </div>
+
+                <!-- History Tabs -->
+                <div class="payment-tabs" style="margin-bottom: 2rem;">
+                    <button class="tab-btn active" data-history-tab="bills">📄 Bill History</button>
+                    <button class="tab-btn" data-history-tab="payments">💰 Payment History</button>
+                </div>
+
+                <!-- Bill History Tab -->
+                <div class="history-tab-content" id="billsHistory">
+                    <div class="history-controls">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search bills...">
+                        <button class="btn-secondary" id="clearHistoryBtn">Clear All</button>
+                    </div>
+
+                    <div class="history-grid" id="historyGrid">
+                        <!-- History items will be dynamically added here -->
+                    </div>
+
+                    <div class="empty-state" id="emptyState">
+                        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="12" y1="18" x2="12" y2="12" />
+                            <line x1="9" y1="15" x2="15" y2="15" />
+                        </svg>
+                        <h3>No Bills Yet</h3>
+                        <p>Start scanning bills to see them here</p>
+                    </div>
+                </div>
+
+                <!-- Payment History Tab -->
+                <div class="history-tab-content" id="paymentsHistory" style="display: none;">
+                    <div class="history-controls">
+                        <select id="paymentFilter" class="form-input" style="max-width: 200px;">
+                            <option value="all">All Transactions</option>
+                            <option value="received">Received Only</option>
+                            <option value="sent">Sent Only</option>
+                        </select>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="downloadFormat" class="form-input" style="max-width: 180px;"
+                                onchange="handleDownloadSelection(this)">
+                                <option value=""> Download As...</option>
+                                <option value="csv"> Excel/CSV</option>
+                                <option value="pdf"> PDF</option>
+                            </select>
+                            <button class="btn-secondary" id="clearPaymentsBtn">Clear All</button>
+                        </div>
+                    </div>
+
+                    <div id="paymentHistoryList" style="margin-top: 1.5rem;">
+                        <!-- Payment items will be added here -->
+                    </div>
+
+                    <div class="empty-state" id="emptyPaymentState">
+                        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <h3>No Payments Yet</h3>
+                        <p>Payment transactions will appear here</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payment Section -->
+            <section id="payment" class="section">
+                <div class="section-header">
+                    <h1>Payment & QR Code</h1>
+                    <p>Send and receive payments easily</p>
+                </div>
+
+                <div class="payment-tabs">
+                    <button class="tab-btn active" data-tab="send">Send Payment</button>
+                    <button class="tab-btn" data-tab="receive">Receive Payment</button>
+                </div>
+
+                <!-- Send Payment Tab -->
+                <div class="tab-content active" id="send">
+                    <div class="payment-card">
+                        <h3>Enter Payment Details</h3>
+                        <form id="paymentForm">
+                            <div class="form-group">
+                                <label for="amount">Amount</label>
+                                <div class="input-with-icon">
+                                    <span class="currency-symbol">₹</span>
+                                    <input type="number" id="amount" class="form-input" placeholder="0.00" step="0.01"
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="recipient">Recipient UPI ID / Phone</label>
+                                <input type="text" id="recipient" class="form-input"
+                                    placeholder="example@upi or 9876543210" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="note">Note (Optional)</label>
+                                <input type="text" id="note" class="form-input" placeholder="Payment for...">
+                            </div>
+
+                            <button type="button" class="btn-primary btn-full" id="scanQrBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7" />
+                                    <rect x="14" y="3" width="7" height="7" />
+                                    <rect x="3" y="14" width="7" height="7" />
+                                    <path d="M14 14h7v7h-7z" />
+                                </svg>
+                                Scan QR Code to Pay
+                            </button>
+
+                            <button type="submit" class="btn-primary btn-full">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19" />
+                                    <polyline points="19 12 12 19 5 12" />
+                                </svg>
+                                Send Payment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Receive Payment Tab -->
+                <div class="tab-content" id="receive">
+                    <div class="payment-card">
+                        <h3>Generate QR Code</h3>
+                        <form id="qrForm">
+                            <div class="form-group">
+                                <label for="qrAmount">Amount to Receive</label>
+                                <div class="input-with-icon">
+                                    <span class="currency-symbol">₹</span>
+                                    <input type="number" id="qrAmount" class="form-input" placeholder="0.00" step="0.01"
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="qrUpi">Your UPI ID</label>
+                                <input type="text" id="qrUpi" class="form-input" placeholder="yourname@upi" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="qrNote">Description (Optional)</label>
+                                <input type="text" id="qrNote" class="form-input" placeholder="Payment for...">
+                            </div>
+
+                            <button type="submit" class="btn-primary btn-full">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7" />
+                                    <rect x="14" y="3" width="7" height="7" />
+                                    <rect x="3" y="14" width="7" height="7" />
+                                    <path d="M14 14h7v7h-7z" />
+                                </svg>
+                                Generate QR Code
+                            </button>
+                        </form>
+
+                        <!-- QR Code Display -->
+                        <div class="qr-display hidden" id="qrDisplay">
+                            <canvas id="qrCanvas"></canvas>
+                            <p class="qr-info">Show this QR code to receive payment</p>
+                            <div class="qr-actions">
+                                <button class="btn-secondary" id="downloadQrBtn">Download QR</button>
+                                <button class="btn-secondary" id="shareQrBtn">Share</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Maps Section -->
+            <section id="maps" class="section">
+                <div class="section-header">
+                    <h1>🧭 Smart Navigation</h1>
+                    <p>Find the best route for Bus, Metro, Rail, or Walking</p>
+                </div>
+
+                <div class="card"
+                    style="padding: 0; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                    <!-- Map Controls Over Map -->
+                    <div style="padding: 1.5rem; background: white; border-bottom: 1px solid #eee;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem;">
+                            <div class="form-group" style="margin: 0; position: relative;">
+                                <input type="text" id="mapSource" placeholder="📍 Start Point"
+                                    style="width: 100%; padding: 0.8rem; padding-right: 3rem; border: 2px solid #f1f5f9; border-radius: 12px; font-size: 0.9rem; background: #fff;">
+                                <button onclick="getCurrentLocation()" id="gpsBtn" title="Use My GPS"
+                                    style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #6366f1; border: none; cursor: pointer; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(99,102,241,0.3); transition: all 0.2s;">
+                                    🎯
+                                </button>
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <input type="text" id="mapDest" placeholder="🏁 Destination"
+                                    style="width: 100%; padding: 0.8rem; border: 2px solid #f1f5f9; border-radius: 12px; font-size: 0.9rem; background: #fff;">
+                            </div>
+                        </div>
+
+                        <!-- Find Route Button with Icon -->
+                        <button onclick="searchRoute()"
+                            style="width: 100%; padding: 0.9rem; margin-bottom: 1.2rem; background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3); transition: all 0.3s;">
+                            <span>🚀</span> Find Route
+                        </button>
+
+                        <!-- Transport Modes -->
+                        <div
+                            style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;">
+                            <button class="mode-btn active" data-mode="driving" title="Car/Taxi"
+                                onclick="setMapMode('driving', this)">🚗 Car</button>
+                            <button class="mode-btn" data-mode="motorcycle" title="Bike"
+                                onclick="setMapMode('motorcycle', this)">🏍️ Bike</button>
+                            <button class="mode-btn" data-mode="transit" title="Bus/Metro/Rail"
+                                onclick="setMapMode('transit', this)">🚌 Transit</button>
+                            <button class="mode-btn" data-mode="walking" title="Paidal"
+                                onclick="setMapMode('walking', this)">🚶 Walking</button>
+                            <button class="mode-btn" id="trafficToggle" title="Clear Road/Traffic"
+                                onclick="toggleTraffic()"
+                                style="margin-left: auto; border-color: #10b981; color: #10b981;">🚦 Clear Road</button>
+                        </div>
+                    </div>
+
+                    <!-- Map Container -->
+                    <div id="mapContainer"
+                        style="height: 380px; background: #e2e8f0; position: relative; overflow: hidden;">
+                        <div id="mapLoading"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f8fafc; z-index: 5;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: 1rem;">🛰️</div>
+                                <h4 style="color: #64748b;">Loading Smart Map...</h4>
+                                <p style="font-size: 0.8rem; color: #94a3b8;">Real-time navigation & traffic</p>
+                            </div>
+                        </div>
+                        <!-- Actual Map -->
+                        <iframe id="mapIframe" width="100%" height="100%" frameborder="0" style="border:0;"
+                            allowfullscreen="" loading="lazy"></iframe>
+
+                        <!-- Real-time Compass UI -->
+                        <div id="compassContainer" class="hidden"
+                            style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); padding: 0.8rem; border-radius: 18px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border: 1px solid white; display: flex; flex-direction: column; align-items: center; gap: 5px; z-index: 10; min-width: 80px;">
+                            <div id="navArrow"
+                                style="font-size: 2rem; color: #6366f1; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                                ⬆️</div>
+                            <div id="distDisplay"
+                                style="font-size: 0.8rem; font-weight: 800; color: #1e293b; font-family: 'Outfit';">--
+                                km</div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Directions Panel (Hidden by default) -->
+                    <div id="directionsPanel" class="hidden"
+                        style="max-height: 250px; overflow-y: auto; background: white; border-top: 1px solid #eee; padding: 1.5rem;">
+                        <h4 style="color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                            📋 Rasta Details (Directions)
+                        </h4>
+                        <div id="directionsList" style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="color: #64748b; font-size: 0.9rem; text-align: center; padding: 1rem;">
+                                Click "Find Route" to see directions
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Place Information Card (New!) -->
+                    <div id="placeDetailsCard" class="hidden"
+                        style="background: white; border-top: 1px solid #eee; overflow: hidden;">
+                        <!-- Place Image -->
+                        <div id="placeImageContainer"
+                            style="height: 180px; width: 100%; background: #f1f5f9; position: relative;">
+                            <img id="placeMainImage"
+                                src="https://images.unsplash.com/photo-1558444493-27dbd9354716?q=80&w=800"
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                            <div
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.6));">
+                            </div>
+                        </div>
+
+                        <!-- Place Info -->
+                        <div style="padding: 1.5rem;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                <div>
+                                    <h2 id="placeName"
+                                        style="margin: 0; font-size: 1.5rem; color: #1e293b; font-family: 'Outfit';">
+                                        Welcome</h2>
+                                    <div id="placeNameHindi" style="font-size: 1rem; color: #64748b; margin-top: 2px;">
+                                        वेलकम</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div id="placeIdDisplay"
+                                        style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">Stop ID: WC</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 1rem;">
+                                <span id="placeRating"
+                                    style="font-weight: 700; color: #1e293b; font-size: 0.9rem;">4.2</span>
+                                <div style="display: flex; color: #f59e0b;">
+                                    ★ ★ ★ ★ <span style="color: #cbd5e1;">★</span>
+                                </div>
+                                <span style="color: #64748b; font-size: 0.85rem;">(4,003)</span>
+                            </div>
+
+                            <div
+                                style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 5px;">
+                                <span id="placeType">Subway station</span> • 🗺️ <span>Delhi</span>
+                            </div>
+
+                            <!-- Tabs Styling (Functional Version) -->
+                            <div
+                                style="display: flex; gap: 2rem; border-bottom: 1px solid #f1f5f9; margin-bottom: 1.5rem;">
+                                <div id="tab-overview" onclick="window.switchMapTab('overview')"
+                                    style="color: #0d9488; font-weight: 700; border-bottom: 3px solid #0d9488; padding-bottom: 10px; cursor: pointer; transition: 0.2s;">
+                                    📋 Overview</div>
+                                <div id="tab-reviews" onclick="window.switchMapTab('reviews')"
+                                    style="color: #64748b; font-weight: 600; padding-bottom: 10px; cursor: pointer; transition: 0.2s;">
+                                    ⭐ Reviews</div>
+                                <div id="tab-about" onclick="window.switchMapTab('about')"
+                                    style="color: #64748b; font-weight: 600; padding-bottom: 10px; cursor: pointer; transition: 0.2s;">
+                                    ℹ️ About</div>
+                            </div>
+
+                            <!-- Dynamic Tab Content Area -->
+                            <div id="mapTabContent"
+                                style="margin-bottom: 1.5rem; min-height: 80px; font-size: 0.9rem; color: #475569; line-height: 1.6;">
+                                <!-- Default Content -->
+                                <div id="tab-content-area">Loading place details...</div>
+                            </div>
+
+                            <!-- Quick Action Buttons (Working Version) -->
+                            <div
+                                style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; text-align: center;">
+                                <div onclick="window.openExternalNavigation()" style="cursor: pointer;">
+                                    <div
+                                        style="width: 44px; height: 44px; background: #0891b2; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <path d="M11 11 L19 3 M19 3 L19 9 M19 3 L13 3" />
+                                        </svg>
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: #0891b2; font-weight: 600;">Directions</div>
+                                </div>
+                                <div onclick="window.saveLocation(document.getElementById('placeName').innerText)"
+                                    style="cursor: pointer;">
+                                    <div
+                                        style="width: 44px; height: 44px; background: white; border: 1.5px solid #e2e8f0; color: #0891b2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: #0891b2; font-weight: 600;">Save</div>
+                                </div>
+                                <div onclick="window.findNearby(document.getElementById('placeName').innerText)"
+                                    style="cursor: pointer;">
+                                    <div
+                                        style="width: 44px; height: 44px; background: white; border: 1.5px solid #e2e8f0; color: #0891b2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <circle cx="12" cy="12" r="3" />
+                                            <path d="M12 7V3 M12 21v-4 M17 12h4 M3 12h4" />
+                                        </svg>
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: #0891b2; font-weight: 600;">Nearby</div>
+                                </div>
+                                <div onclick="window.sendToPhone(document.getElementById('placeName').innerText)"
+                                    style="cursor: pointer;">
+                                    <div
+                                        style="width: 44px; height: 44px; background: white; border: 1.5px solid #e2e8f0; color: #0891b2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <rect x="5" y="2" width="14" height="20" rx="2" />
+                                            <path d="M12 18h.01" />
+                                        </svg>
+                                    </div>
+                                    <div style="font-size: 0.72rem; color: #0891b2; font-weight: 600; line-height: 1;">
+                                        Send to phone</div>
+                                </div>
+                                <div onclick="window.shareLocation(document.getElementById('placeName').innerText)"
+                                    style="cursor: pointer;">
+                                    <div
+                                        style="width: 44px; height: 44px; background: white; border: 1.5px solid #e2e8f0; color: #0891b2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                            <polyline points="16 6 12 2 8 6" />
+                                            <line x1="12" y1="2" x2="12" y2="15" />
+                                        </svg>
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: #0891b2; font-weight: 600;">Share</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direction Info -->
+                    <div id="directionInfo" style="padding: 1.5rem; background: #f8fafc; border-top: 1px solid #eee;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div id="routeStatus">
+                                <div id="routeTitle" style="font-weight: 700; color: #1e293b; font-size: 1.1rem;">Ready
+                                    for Navigation</div>
+                                <div id="routeSub" style="font-size: 0.85rem; color: #64748b;">Enter details to see
+                                    directions</div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-secondary" id="openMapBtn"
+                                    style="padding: 0.8rem 1rem; border-radius: 12px; display: none;"
+                                    onclick="openInGoogleMaps()">
+                                    🚀 Start View
+                                </button>
+                                <button class="btn-primary" onclick="searchRoute()"
+                                    style="padding: 0.8rem 1.5rem; border-radius: 12px; background: #6366f1;">
+                                    🔍 Find Route
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Favorites -->
+                <div
+                    style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+                    <div class="card" style="padding: 1rem; text-align: center; cursor: pointer;"
+                        onclick="quickMapSearch('Metro Station')">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🚇</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Metro Station</div>
+                    </div>
+                    <div class="card" style="padding: 1rem; text-align: center; cursor: pointer;"
+                        onclick="quickMapSearch('Bus Stand')">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🚌</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Bus Stand</div>
+                    </div>
+                    <div class="card" style="padding: 1rem; text-align: center; cursor: pointer;"
+                        onclick="quickMapSearch('Railway Station')">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🚆</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Railway Station</div>
+                    </div>
+                    <div class="card" style="padding: 1rem; text-align: center; cursor: pointer;"
+                        onclick="quickMapSearch('Parking')">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🅿️</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">Nearby Parking</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Account/Profile Section -->
+            <section id="accountSection" class="section">
+                <div class="section-header">
+                    <h1>⚙️ Account Settings</h1>
+                    <p>Manage your profile and security settings</p>
+                </div>
+
+                <!-- Profile Card -->
+                <div class="card">
+                    <h3>👤 Your Profile</h3>
+                    <div style="display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap;">
+                        <!-- Profile Photo -->
+                        <div style="text-align: center;">
+                            <img id="profilePhotoLarge"
+                                src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%236366f1'/><text x='50' y='50' text-anchor='middle' dy='.3em' fill='white' font-size='40' font-family='Arial'>👤</text></svg>"
+                                alt="Profile"
+                                style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #6366f1;">
+                            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-direction: column;">
+                                <button class="btn-secondary" onclick="uploadProfilePhoto()"
+                                    style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                    📸 Change Photo
+                                </button>
+                                <button class="btn-secondary" onclick="removeProfilePhoto()"
+                                    style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                    🗑️ Remove
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Profile Info -->
+                        <div style="flex: 1; min-width: 250px;">
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-weight: bold; color: #666; font-size: 0.85rem;">Name</label>
+                                <p id="profileName" style="font-size: 1.2rem; margin: 0.25rem 0;">Loading...</p>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-weight: bold; color: #666; font-size: 0.85rem;">Email</label>
+                                <p id="profileEmail" style="font-size: 1rem; margin: 0.25rem 0; color: #6366f1;">
+                                    Loading...</p>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-weight: bold; color: #666; font-size: 0.85rem;">Phone</label>
+                                <p id="profilePhone" style="font-size: 1rem; margin: 0.25rem 0;">Not set</p>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-weight: bold; color: #666; font-size: 0.85rem;">Bio</label>
+                                <p id="profileBio" style="font-size: 0.95rem; margin: 0.25rem 0; color: #666;">No bio
+                                    yet</p>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="font-weight: bold; color: #666; font-size: 0.85rem;">Member Since</label>
+                                <p id="profileJoined" style="font-size: 0.95rem; margin: 0.25rem 0;">Loading...</p>
+                            </div>
+
+                            <button class="btn-primary" onclick="editProfile()" style="margin-top: 1rem;">
+                                ✏️ Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password & Security -->
+                <div class="card">
+                    <h3>🔐 Password & Security</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                        <button class="btn-secondary btn-full" onclick="changePasswordInApp()"
+                            style="flex: 1; min-width: 200px;">
+                            🔑 Change Password
+                        </button>
+                        <button class="btn-secondary btn-full" onclick="forgotPasswordInApp()"
+                            style="flex: 1; min-width: 200px;">
+                            🔗 Reset via Email
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bank Account & Payment QR - SIMPLIFIED -->
+                <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h3 style="margin: 0 0 0.5rem; display: flex; align-items: center; gap: 10px;">
+                        💸 Start Receiving Payments
+                    </h3>
+                    <p style="opacity: 0.9; margin: 0 0 1.5rem; font-size: 0.95rem; line-height: 1.5;">
+                        Link your UPI & generate your payment QR instantly. Get paid faster, track smarter! ⚡
+                    </p>
+
+                    <!-- Big ADD Button -->
+                    <button class="btn-primary" onclick="requirePaymentPIN(addBankDetailsSimple)"
+                        style="background: white; color: #6366f1; width: 100%; padding: 1.2rem; font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                        </svg>
+                        Connect Your Payment Details
+                    </button>
+
+                    <!-- Details Container (Hidden by default, shows after adding) -->
+                    <div id="bankDetailsContainer"
+                        style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px; backdrop-filter: blur(10px); display: none;">
+                        <h4 style="margin: 0 0 1rem; font-size: 1.1rem;">✅ Saved Details</h4>
+
+                        <div style="display: grid; gap: 0.75rem;">
+                            <!-- UPI ID -->
+                            <div style="background: rgba(255,255,255,0.15); padding: 0.75rem; border-radius: 8px;">
+                                <div style="font-size: 0.75rem; opacity: 0.8; margin-bottom: 0.25rem;">📱 UPI ID</div>
+                                <div id="displayUpiId" style="font-size: 1rem; font-weight: 600;">-</div>
+                            </div>
+
+                            <!-- Bank Name -->
+                            <div style="background: rgba(255,255,255,0.15); padding: 0.75rem; border-radius: 8px;">
+                                <div style="font-size: 0.75rem; opacity: 0.8; margin-bottom: 0.25rem;">🏦 Bank</div>
+                                <div id="displayBankName" style="font-size: 1rem; font-weight: 600;">-</div>
+                            </div>
+
+                            <!-- Account Number -->
+                            <div style="background: rgba(255,255,255,0.15); padding: 0.75rem; border-radius: 8px;">
+                                <div style="font-size: 0.75rem; opacity: 0.8; margin-bottom: 0.25rem;">💳 Account</div>
+                                <div id="displayAccount" style="font-size: 1rem; font-weight: 600;">-</div>
+                            </div>
+
+                            <!-- IFSC Code -->
+                            <div style="background: rgba(255,255,255,0.15); padding: 0.75rem; border-radius: 8px;">
+                                <div style="font-size: 0.75rem; opacity: 0.8; margin-bottom: 0.25rem;">🏛️ IFSC</div>
+                                <div id="displayIfsc" style="font-size: 1rem; font-weight: 600;">-</div>
+                            </div>
+
+                            <!-- Account Holder -->
+                            <div style="background: rgba(255,255,255,0.15); padding: 0.75rem; border-radius: 8px;">
+                                <div style="font-size: 0.75rem; opacity: 0.8; margin-bottom: 0.25rem;">👤 Account Holder
+                                </div>
+                                <div id="displayHolder" style="font-size: 1rem; font-weight: 600;">-</div>
+                            </div>
+                        </div>
+
+                        <!-- QR Code Section -->
+                        <div
+                            style="background: white; padding: 2rem; border-radius: 12px; margin-top: 1.5rem; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                            <div
+                                style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 1rem;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#6366f1">
+                                    <path
+                                        d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm15 0h3v3h-3v-3zm0 5h3v3h-3v-3zm-5-5h3v8h-3v-8z" />
+                                </svg>
+                                <h4 style="color: #6366f1; margin: 0; font-size: 1.1rem; font-weight: 600;">Your Payment
+                                    QR Code</h4>
+                            </div>
+                            <p style="color: #666; font-size: 0.9rem; margin: 0 0 1.5rem;">Share this QR to receive
+                                instant payments</p>
+                            <div id="personalQrContainer"
+                                style="min-height: 200px; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #f9fafb; border-radius: 8px; padding: 1rem;">
+                                <div style="color: #999; font-size: 0.9rem;">Generating your QR code...</div>
+                            </div>
+                            <button class="btn-secondary" onclick="downloadPersonalQR()" id="downloadPersonalQRBtn"
+                                style="margin-top: 1rem; width: 100%; display: none; background: #6366f1; color: white; border: none;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"
+                                    style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                    <path
+                                        d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
+                                </svg>
+                                Download QR Code
+                            </button>
+                        </div>
+
+                        <!-- Update Button -->
+                        <button class="btn-secondary" onclick="requirePaymentPIN(addBankDetailsSimple)"
+                            style="width: 100%; margin-top: 1rem; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); color: white; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                                <path
+                                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                            </svg>
+                            Update Payment Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Send Money Section -->
+                <div class="card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" />
+                        </svg>
+                        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 600;">Send Money</h3>
+                    </div>
+                    <p style="opacity: 0.9; margin: 0 0 1.5rem; font-size: 0.95rem;">Quick payment to any UPI ID or
+                        phone number</p>
+
+                    <button class="btn-primary" onclick="requirePaymentPIN(switchToPaymentTab)"
+                        style="background: white; color: #10b981; width: 100%; padding: 1.2rem; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                        </svg>
+                        Send Payment Now
+                    </button>
+                </div>
+
+                <!-- Security & App Lock Section -->
+                <div class="card"
+                    style="border: 1px solid rgba(99, 102, 241, 0.3); background: rgba(99, 102, 241, 0.05);">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="#6366f1">
+                            <path
+                                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v5.7c0 4.66-3.13 9.03-7 10.18-3.87-1.15-7-5.52-7-10.18V6.3l7-3.12zM12 7c-1.1 0-2 .9-2 2 0 .63.3 1.19.77 1.54l-1.1 2.91C9.53 13.84 9.8 14 10 14h4c.2 0 .47-.16.33-.55l-1.1-2.91c.47-.35.77-.91.77-1.54 0-1.1-.9-2-2-2z" />
+                        </svg>
+                        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 600;">Security & App Lock</h3>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <!-- Lock Now -->
+                        <div
+                            style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                            <h4 style="margin: 0 0 0.5rem; font-size: 0.95rem;">Lock Application</h4>
+                            <p style="margin: 0 0 1rem; font-size: 0.8rem; opacity: 0.7;">Instantly lock the app until
+                                your PIN is entered.</p>
+                            <button class="btn-primary" onclick="window.location.reload()"
+                                style="width: 100%; border-radius: 8px; padding: 0.6rem; background: #6366f1;">
+                                🔒 Lock App Now
+                            </button>
+                        </div>
+
+                        <!-- PIN Management -->
+                        <div
+                            style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                            <h4 style="margin: 0 0 0.5rem; font-size: 0.95rem;">Security PIN</h4>
+                            <p style="margin: 0 0 1rem; font-size: 0.8rem; opacity: 0.7;">Change your 4-digit security
+                                PIN for payments/lock.</p>
+                            <button class="btn-secondary"
+                                onclick="requirePaymentPIN(() => { localStorage.removeItem('paymentPIN'); requirePaymentPIN(); })"
+                                style="width: 100%; border-radius: 8px; padding: 0.6rem;">
+                                🛡️ Change Security PIN
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Statistics -->
+                <div class="card">
+                    <h3>📊 Your Activity</h3>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+                        <div
+                            style="text-align: center; padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white;">
+                            <h2 id="userScans" style="margin: 0; font-size: 2rem;">0</h2>
+                            <p style="margin: 0.5rem 0 0; font-size: 0.9rem; opacity: 0.9;">Bills Scanned</p>
+                        </div>
+                        <div
+                            style="text-align: center; padding: 1rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; color: white;">
+                            <h2 id="userPayments" style="margin: 0; font-size: 2rem;">0</h2>
+                            <p style="margin: 0.5rem 0 0; font-size: 0.9rem; opacity: 0.9;">Payments</p>
+                        </div>
+                        <div
+                            style="text-align: center; padding: 1rem; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; color: white;">
+                            <h2 id="userHistory" style="margin: 0; font-size: 2rem;">0</h2>
+                            <p style="margin: 0.5rem 0 0; font-size: 0.9rem; opacity: 0.9;">History Items</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Actions -->
+                <div class="card">
+                    <h3>⚡ Quick Actions</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                        <button class="btn-secondary" onclick="loadAccountProfile()">
+                            🔄 Refresh Profile
+                        </button>
+                        <button class="btn-danger" onclick="document.getElementById('logoutBtn').click()">
+                            🚪 Logout
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Bank Account Modal - PhonePe Style -->
+    <div id="bankAccountModal" class="modal hidden" style="z-index: 9999;">
+        <div class="modal-content"
+            style="max-width: 500px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+            <button class="modal-close" onclick="closeBankModal()"
+                style="color: white; font-size: 2rem;">&times;</button>
+
+            <div style="color: white; margin-bottom: 2rem;">
+                <h2 style="margin: 0 0 0.5rem; font-size: 1.5rem;">💳 Add Bank Account</h2>
+                <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Enter your payment details</p>
+            </div>
+
+            <form id="bankAccountForm" style="background: white; padding: 2rem; border-radius: 16px;">
+                <!-- UPI ID -->
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">
+                        📱 UPI ID <span style="color: #ef4444;">*</span>
+                    </label>
+                    <input type="text" id="modalUpiId" class="form-input" placeholder="9876543210@paytm" required
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; color: #1f2937; background: white;">
+                    <small style="color: #6b7280; font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        e.g., yourname@paytm, yourname@phonepe
+                    </small>
+                </div>
+
+                <!-- Bank Name -->
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">
+                        🏦 Bank Name
+                    </label>
+                    <select id="modalBankName" class="form-input"
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; color: #1f2937; background: white;">
+                        <option value="">Select Bank (Optional)</option>
+                        <option value="State Bank of India">State Bank of India (SBI)</option>
+                        <option value="HDFC Bank">HDFC Bank</option>
+                        <option value="ICICI Bank">ICICI Bank</option>
+                        <option value="Axis Bank">Axis Bank</option>
+                        <option value="Punjab National Bank">Punjab National Bank (PNB)</option>
+                        <option value="Bank of Baroda">Bank of Baroda</option>
+                        <option value="Canara Bank">Canara Bank</option>
+                        <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+                        <option value="Yes Bank">Yes Bank</option>
+                        <option value="IDFC First Bank">IDFC First Bank</option>
+                        <option value="Paytm Payments Bank">Paytm Payments Bank</option>
+                        <option value="Axis Bank">Axis Bank</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Account Number -->
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">
+                        🔢 Account Number
+                    </label>
+                    <input type="text" id="modalAccountNumber" class="form-input" placeholder="1234567890"
+                        maxlength="18"
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; color: #1f2937; background: white;">
+                    <small style="color: #6b7280; font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Optional - For record keeping
+                    </small>
+                </div>
+
+                <!-- IFSC Code -->
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">
+                        🏛️ IFSC Code
+                    </label>
+                    <input type="text" id="modalIfscCode" class="form-input" placeholder="SBIN0001234" maxlength="11"
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; text-transform: uppercase; color: #1f2937; background: white;">
+                    <small style="color: #6b7280; font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                        Optional - 11 character code
+                    </small>
+                </div>
+
+                <!-- Account Holder -->
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151;">
+                        👤 Account Holder Name
+                    </label>
+                    <input type="text" id="modalAccountHolder" class="form-input" placeholder="Your Name"
+                        style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; color: #1f2937; background: white;">
+                </div>
+
+                <!-- Buttons -->
+                <div style="display: flex; gap: 1rem;">
+                    <button type="button" onclick="closeBankModal()" class="btn-secondary"
+                        style="flex: 1; padding: 0.875rem; font-size: 1rem;">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-primary"
+                        style="flex: 1; padding: 0.875rem; font-size: 1rem; font-weight: 600;">
+                        ✅ Save & Generate QR
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Security PIN Modal -->
+    <div id="paymentPinModal" class="modal hidden" style="z-index: 10001;">
+        <div class="modal-content"
+            style="max-width: 350px; text-align: center; background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1);">
+            <div id="pinModalHeader">
+                <h3 id="pinModalTitle" style="color: white; margin-bottom: 0.5rem;">🔐 Payment Security</h3>
+                <p id="pinModalDesc" style="color: #a0a0b8; font-size: 0.9rem; margin-bottom: 1.5rem;">Enter your
+                    4-digit PIN to continue</p>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 1.5rem;">
+                <input type="password" maxlength="1" class="pin-input" id="pin1" autofocus
+                    style="width: 45px; height: 55px; text-align: center; font-size: 1.5rem; border-radius: 8px; border: 2px solid #333; background: #0f0f1a; color: white;">
+                <input type="password" maxlength="1" class="pin-input" id="pin2"
+                    style="width: 45px; height: 55px; text-align: center; font-size: 1.5rem; border-radius: 8px; border: 2px solid #333; background: #0f0f1a; color: white;">
+                <input type="password" maxlength="1" class="pin-input" id="pin3"
+                    style="width: 45px; height: 55px; text-align: center; font-size: 1.5rem; border-radius: 8px; border: 2px solid #333; background: #0f0f1a; color: white;">
+                <input type="password" maxlength="1" class="pin-input" id="pin4"
+                    style="width: 45px; height: 55px; text-align: center; font-size: 1.5rem; border-radius: 8px; border: 2px solid #333; background: #0f0f1a; color: white;">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-secondary" onclick="closePinModal()"
+                    style="flex: 1; padding: 0.75rem;">Cancel</button>
+                <button id="pinSubmitBtn" class="btn-primary"
+                    style="flex: 1; padding: 0.75rem; background: #6366f1;">Verify</button>
+            </div>
+
+            <p id="pinError" style="color: #ef4444; font-size: 0.8rem; margin-top: 1rem; display: none;">❌ Incorrect
+                PIN. Please try again.</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast hidden" id="toast">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Modal for Bill Details -->
+    <div class="modal hidden" id="billModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h2 id="modalTitle">Bill Details</h2>
+            <img id="modalImage" alt="Bill">
+            <div class="modal-text" id="modalText"></div>
+
+            <!-- Translation Options in Modal -->
+            <div class="translation-controls"
+                style="margin: 1.25rem 0; padding: 1.25rem; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <label
+                    style="font-size: 0.9rem; color: #374151; margin-bottom: 0.75rem; display: block; font-weight: 600;">🌍
+                    Translate & Listen In:</label>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <select id="translateTargetModal" class="select-input"
+                        style="flex: 1; min-width: 150px; padding: 0.65rem; border: 2px solid #e5e7eb; border-radius: 8px; color: #111827; background: #f9fafb; font-size: 0.95rem;">
+                        <option value="en-US">English</option>
+                        <option value="hi-IN">Hindi</option>
+                        <option value="ur-PK">Urdu</option>
+                        <option value="ar-SA">Arabic</option>
+                        <option value="es-ES">Spanish</option>
+                        <option value="fr-FR">French</option>
+                        <option value="de-DE">German</option>
+                        <option value="it-IT">Italian</option>
+                        <option value="ja-JP">Japanese</option>
+                        <option value="ko-KR">Korean</option>
+                        <option value="pt-BR">Portuguese</option>
+                        <option value="ru-RU">Russian</option>
+                        <option value="zh-CN">Chinese</option>
+                        <option value="zh-TW">Chinese (Traditional)</option>
+
+                    </select>
+                    <button class="btn-primary"
+                        onclick="translateAndSpeak(document.getElementById('modalText').textContent, document.getElementById('translateTargetModal').value)"
+                        style="background: #4f46e5; color: white; padding: 0.65rem 1.25rem; border-radius: 8px; font-weight: 600;">
+                        🚀 Translate & Suniye
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-primary" id="modalSpeakBtn"
+                    style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">🔊 Suniye (Listen)</button>
+                <button class="btn-danger" id="modalDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Receipt Modal (Success Slip) -->
+    <div class="modal hidden" id="receiptModal" style="z-index: 10002;">
+        <div class="modal-content"
+            style="max-width: 400px; padding: 0; background: #f8fafc; overflow: hidden; border-radius: 20px;">
+            <!-- Success Header -->
+            <div style="background: #10b981; padding: 2rem; text-align: center; color: white;">
+                <div
+                    style="background: rgba(255,255,255,0.2); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                </div>
+                <h2 style="margin: 0; font-size: 1.5rem;">Payment Successful!</h2>
+                <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.9rem;">Transaction ID: <span
+                        id="receiptId">#12345</span></p>
+            </div>
+
+            <!-- Receipt Details -->
+            <div style="padding: 2rem; background: white;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 0.5rem;">Amount Paid</div>
+                    <div style="font-size: 2.5rem; font-weight: 800; color: #1e293b;">₹ <span
+                            id="receiptAmount">0.00</span></div>
+                </div>
+
+                <div style="display: grid; gap: 1.25rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px dashed #e2e8f0;">
+                        <span style="color: #64748b; font-size: 0.9rem;">Recipient</span>
+                        <span id="receiptRecipient" style="font-weight: 600; color: #1e293b;">-</span>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px dashed #e2e8f0;">
+                        <span style="color: #64748b; font-size: 0.9rem;">Date & Time</span>
+                        <span id="receiptTime" style="font-weight: 600; color: #1e293b;">-</span>
+                    </div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px dashed #e2e8f0;">
+                        <span style="color: #64748b; font-size: 0.9rem;">Status</span>
+                        <span
+                            style="background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 99px; font-size: 0.75rem; font-weight: 700;">COMPLETED</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; padding: 1rem; background: #f1f5f9; border-radius: 8px;">
+                    <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 0.25rem;">Note</div>
+                    <div id="receiptNote" style="font-size: 0.9rem; color: #1e293b; font-style: italic;">No notes added
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div style="padding: 1.5rem; background: #f8fafc; display: flex; gap: 1rem;">
+                <button class="btn-secondary" onclick="closeReceiptModal()"
+                    style="flex: 1; border-radius: 12px; padding: 0.8rem;">
+                    Close
+                </button>
+                <button class="btn-primary" onclick="downloadReceipt()"
+                    style="flex: 1; border-radius: 12px; padding: 0.8rem; background: #10b981;">
+                    📥 Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Notification Service -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
+    <!-- QR Code Library with fallback -->
+    <script>
+        // Try primary CDN
+        (function loadQRCode() {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
+            script.async = false;
+
+            script.onload = function () {
+                console.log('✅ QRCode library loaded successfully from jsdelivr');
+                window.qrCodeLibraryLoaded = true;
+            };
+
+            script.onerror = function () {
+                console.warn('⚠️ Primary CDN failed, trying fallback...');
+                // Try fallback CDN
+                const fallbackScript = document.createElement('script');
+                fallbackScript.src = 'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js';
+                fallbackScript.async = false;
+
+                fallbackScript.onload = function () {
+                    console.log('✅ QRCode library loaded from fallback CDN (unpkg)');
+                    window.qrCodeLibraryLoaded = true;
+                };
+
+                fallbackScript.onerror = function () {
+                    console.error('❌ Both CDNs failed to load QRCode library');
+                    window.qrCodeLibraryLoaded = false;
+
+                    // Show user-friendly message
+                    setTimeout(() => {
+                        if (typeof QRCode === 'undefined') {
+                            console.error('QRCode library not available');
+                            // Alert will be shown by app.js generateQRCode function
+                        }
+                    }, 2000);
+                };
+
+                document.head.appendChild(fallbackScript);
+            };
+
+            document.head.appendChild(script);
+        })();
+    </script>
+
+    <script src="../js/app.js"></script>
+    <script src="../js/account-functions.js"></script>
+    <script src="../js/auto-payment-detector.js"></script>
+    <script src="../js/payment-notifications.js"></script>
+    <script src="../js/download-selector.js"></script>
+    <script src="../js/account-autoload.js"></script>
+    <script src="../js/payment-switcher.js"></script>
+    <script src="../js/bill-replay.js"></script>
+    <script src="../js/voice-stop.js"></script>
+    <script src="../js/translator.js"></script>
+    <script src="../js/payment-security.js"></script>
+    <script src="../js/receipt-generator.js"></script>
+    <script src="../js/maps.js"></script>
+</body>
+
+</html>

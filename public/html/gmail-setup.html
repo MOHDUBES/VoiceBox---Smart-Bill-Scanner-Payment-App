@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📧 Gmail Notification Setup - VoiceBox</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .step {
+            background: #f7fafc;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .code {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0.5rem;
+        }
+
+        .success {
+            background: #c6f6d5;
+            border-color: #48bb78;
+        }
+
+        .warning {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        ul {
+            margin: 1rem 0 1rem 2rem;
+            line-height: 2;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #5558d9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📧 Gmail Notification Setup</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 2rem;">
+            User ko login pe automatically Gmail par confirmation email bhejein!
+        </p>
+
+        <!-- Current Status -->
+        <div class="step success">
+            <h3>✅ Currently Working (No Setup Needed):</h3>
+            <ul>
+                <li>🎉 Welcome toast message</li>
+                <li>🔔 Browser desktop notification</li>
+                <li>📝 Console email preview</li>
+                <li>📊 Detailed login info logging</li>
+            </ul>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="step">
+            <h3><span class="step-number">1</span> EmailJS Account Banao (FREE)</h3>
+            <p>5 minutes mein setup ho jayega!</p>
+            <ul>
+                <li>Go to: <strong>https://www.emailjs.com/</strong></li>
+                <li>Click "Sign Up Free"</li>
+                <li>Gmail ya koi bhi email se signup karo</li>
+                <li>Email verification karo</li>
+            </ul>
+            <a href="https://www.emailjs.com/" target="_blank" class="btn">
+                🚀 EmailJS Account Banao
+            </a>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step">
+            <h3><span class="step-number">2</span> Gmail Service Connect Karo</h3>
+            <ol style="margin-left: 2rem; line-height: 2;">
+                <li>EmailJS Dashboard → <strong>"Email Services"</strong></li>
+                <li>Click <strong>"Add New Service"</strong></li>
+                <li><strong>Gmail</strong> select karo</li>
+                <li>Click <strong>"Connect Account"</strong></li>
+                <li>Apni Gmail se login karo</li>
+                <li><strong>Allow</strong> permissions</li>
+                <li>✅ Service ID copy karo (example: service_abc123)</li>
+            </ol>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step">
+            <h3><span class="step-number">3</span> Email Template Create Karo</h3>
+            <p>Template mein ye content paste karo:</p>
+            <div class="code">
+                Subject: 🔐 VoiceBox - Login Confirmation<br><br>
+                Hello {{to_name}},<br><br>
+                ✅ Your VoiceBox account login was successful!<br><br>
+                <strong>Login Details:</strong><br>
+                🕐 Time: {{login_time}}<br>
+                📅 Date: {{login_date}}<br>
+                💻 Device: {{device}}<br>
+                🌐 Browser: {{browser}}<br><br>
+                If this wasn't you, please contact support immediately.<br><br>
+                Best regards,<br>
+                VoiceBox Security Team
+            </div>
+            <p style="margin-top: 1rem;">✅ Template ID copy karo (example: template_xyz789)</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step">
+            <h3><span class="step-number">4</span> Configuration Values</h3>
+            <p>EmailJS dashboard se ye 3 values copy karo:</p>
+
+            <label><strong>Service ID:</strong></label>
+            <input type="text" id="serviceId" placeholder="service_abc123">
+
+            <label><strong>Template ID:</strong></label>
+            <input type="text" id="templateId" placeholder="template_xyz789">
+
+            <label><strong>Public Key:</strong></label>
+            <input type="text" id="publicKey" placeholder="abcd1234EFGH5678">
+
+            <button onclick="generateCode()">📋 Generate Code</button>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="step">
+            <h3><span class="step-number">5</span> Code Paste Karo</h3>
+            <p>File: <strong>app.js</strong> (line 135-137)</p>
+            <div class="code" id="generatedCode">
+                <em>👆 Upar fields bharo aur "Generate Code" click karo</em>
+            </div>
+            <button onclick="copyCode()" id="copyBtn" style="display: none;">
+                📋 Copy Code
+            </button>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="step success">
+            <h3><span class="step-number">6</span> Test Karo!</h3>
+            <ol style="margin-left: 2rem; line-height: 2;">
+                <li>Logout karo (if logged in)</li>
+                <li>Wapas login karo</li>
+                <li>Gmail inbox check karo 📧</li>
+                <li>Email aana chahiye: <strong>"VoiceBox - Login Confirmation"</strong></li>
+            </ol>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Important:</strong>
+            <ul>
+                <li>FREE plan: 200 emails/month</li>
+                <li>No credit card needed</li>
+                <li>Email delivery: 1-2 seconds</li>
+                <li>Works with Gmail, Yahoo, Outlook</li>
+            </ul>
+        </div>
+
+        <!-- Email Preview -->
+        <div class="step">
+            <h3>📧 Email Preview (Aisa Dikhega)</h3>
+            <div style="border: 2px solid #667eea; padding: 2rem; border-radius: 10px; background: white;">
+                <h4 style="color: #667eea;">🔐 VoiceBox - Login Confirmation</h4>
+                <p>Hello <strong>John Doe</strong>,</p>
+                <p>✅ Your VoiceBox account login was successful!</p>
+                <p><strong>Login Details:</strong></p>
+                <ul>
+                    <li>🕐 Time: 10:30 PM</li>
+                    <li>📅 Date: 27/12/2023</li>
+                    <li>💻 Device: Desktop</li>
+                    <li>🌐 Browser: Chrome</li>
+                </ul>
+                <p>If this wasn't you, please contact support immediately.</p>
+                <p>Best regards,<br>VoiceBox Security Team</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="EMAIL_SETUP.md" class="btn">📖 Complete Guide</a>
+            <a href="login.html" class="btn">🚪 Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        function generateCode() {
+            const serviceId = document.getElementById('serviceId').value;
+            const templateId = document.getElementById('templateId').value;
+            const publicKey = document.getElementById('publicKey').value;
+
+            if (!serviceId || !templateId || !publicKey) {
+                alert('❌ Please fill all fields!');
+                return;
+            }
+
+            const code = `const SERVICE_ID = '${serviceId}';<br>const TEMPLATE_ID = '${templateId}';<br>const PUBLIC_KEY = '${publicKey}';`;
+
+            document.getElementById('generatedCode').innerHTML = code;
+            document.getElementById('copyBtn').style.display = 'inline-block';
+
+            alert('✅ Code generated! Click "Copy Code" button.');
+        }
+
+        function copyCode() {
+            const serviceId = document.getElementById('serviceId').value;
+            const templateId = document.getElementById('templateId').value;
+            const publicKey = document.getElementById('publicKey').value;
+
+            const code = `const SERVICE_ID = '${serviceId}';\nconst TEMPLATE_ID = '${templateId}';\nconst PUBLIC_KEY = '${publicKey}';`;
+
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Code copied to clipboard!\n\nNow:\n1. Open app.js\n2. Find line 135-137\n3. Replace the values\n4. Save file\n5. Refresh browser\n6. Test login!');
+            });
+        }
+    </script>
+</body>
+
+</html>

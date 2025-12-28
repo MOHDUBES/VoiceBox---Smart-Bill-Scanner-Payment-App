@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - VoiceBox</title>
+    <meta name="description" content="Admin-only login for VoiceBox">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        .admin-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc2626;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .admin-badge svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .auth-forms .form-header {
+            border-left: 4px solid #dc2626;
+            padding-left: 20px;
+        }
+
+        .admin-info-box {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-info-box svg {
+            width: 24px;
+            height: 24px;
+            color: #dc2626;
+            flex-shrink: 0;
+        }
+
+        .admin-info-box p {
+            font-size: 14px;
+            color: #7f1d1d;
+            margin: 0;
+        }
+
+        .divider {
+            position: relative;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 12px;
+            color: #6b7280;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .back-to-user {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .back-to-user a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .back-to-user a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Admin Badge -->
+    <div class="admin-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v2m0 4v2m7-10.586A2 2 0 0020.586 4H3.414A2 2 0 002 5.414v13.172A2 2 0 003.414 20h17.172A2 2 0 0022 18.586V5.414z" />
+            <circle cx="12" cy="12" r="1" />
+        </svg>
+        ADMIN PANEL
+    </div>
+
+    <div class="auth-container">
+        <!-- Left Side - Branding -->
+        <div class="auth-branding">
+            <div class="branding-content">
+                <div class="logo-large">
+                    <svg width="80" height="80" viewBox="0 0 40 40" fill="none">
+                        <rect width="40" height="40" rx="12" fill="url(#gradient1)" />
+                        <path d="M20 10 L30 20 L20 30 L10 20 Z" fill="white" opacity="0.9" />
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="40" y2="40">
+                                <stop offset="0%" stop-color="#dc2626" />
+                                <stop offset="100%" stop-color="#991b1b" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <h1>Admin Panel</h1>
+                </div>
+                <h2>VoiceBox - Restricted Access</h2>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span>Full User Management</span>
+                    </div>
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span>Analytics & Reports</span>
+                    </div>
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span>System Control Panel</span>
+                    </div>
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span>Advanced Security</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Admin Login Form -->
+        <div class="auth-forms">
+            <div class="form-container active">
+                <div class="form-header">
+                    <h2>Admin Access</h2>
+                    <p>Authorized personnel only</p>
+                </div>
+
+                <!-- Security Warning -->
+                <div class="admin-info-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 9v2m0 4v2m7-10.586A2 2 0 00020.586 4H3.414A2 2 0 002 5.414v13.172A2 2 0 003.414 20h17.172A2 2 0 0022 18.586V5.414z" />
+                    </svg>
+                    <p>⚠️ This is a restricted area. Unauthorized access is prohibited and logged.</p>
+                </div>
+
+                <form id="adminLoginForm">
+                    <div class="form-group">
+                        <label for="adminEmail">Email Address</label>
+                        <div class="input-wrapper">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                            <input type="email" id="adminEmail" placeholder="admin@voicebox.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adminPassword">Password</label>
+                        <div class="input-wrapper">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                            <input type="password" id="adminPassword" placeholder="Enter admin password" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword('adminPassword')">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox">
+                            <input type="checkbox" id="adminRememberMe">
+                            <span>Remember me</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-full">
+                        <span>Access Admin Panel</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+
+                <div class="back-to-user">
+                    <p>Regular User?</p>
+                    <a href="login.html">← Back to User Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js"></script>
+
+    <script>
+        // Helper function
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            field.type = field.type === 'password' ? 'text' : 'password';
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            alert(message);
+        }
+
+        // Admin Login Handler
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const rememberMe = document.getElementById('adminRememberMe').checked;
+
+            // Demo Mode: Check admin credentials
+            const adminCredentials = {
+                email: 'admin@voicebox.com',
+                password: 'admin123' // Change this to your secure password
+            };
+
+            if (email === adminCredentials.email && password === adminCredentials.password) {
+                // ✅ Admin Login Success
+                const adminUser = {
+                    uid: 'admin_' + Date.now(),
+                    email: email,
+                    name: 'Admin User',
+                    role: 'admin',
+                    loginTime: new Date().toISOString()
+                };
+
+                if (rememberMe) {
+                    localStorage.setItem('voicebox_current_user', JSON.stringify(adminUser));
+                } else {
+                    sessionStorage.setItem('voicebox_current_user', JSON.stringify(adminUser));
+                }
+
+                showToast('✅ Admin Access Granted! Redirecting to dashboard...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 1000);
+            } else {
+                // ❌ Admin Login Failed
+                showToast('❌ Invalid admin credentials. Access denied.', 'error');
+                console.error('Admin login failed for email:', email);
+            }
+        });
+
+        // Auto-redirect if already admin
+        window.addEventListener('load', () => {
+            const currentUser = JSON.parse(
+                localStorage.getItem('voicebox_current_user') ||
+                sessionStorage.getItem('voicebox_current_user') ||
+                '{}'
+            );
+
+            if (currentUser.role === 'admin') {
+                window.location.href = 'admin.html';
+            }
+        });
+    </script>
+</body>
+
+</html>
