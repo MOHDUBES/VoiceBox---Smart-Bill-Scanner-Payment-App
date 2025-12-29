@@ -302,36 +302,73 @@
     <!-- Initialize Demo Users if not already present -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize demo users if needed
-            const existingUsers = localStorage.getItem('voicebox_users');
-            if (!existingUsers) {
+            // Initialize demo users only if absolutely no data exists
+            const existingUsersRaw = localStorage.getItem('voicebox_users');
+            if (!existingUsersRaw) {
+                // ... (Keep existing demo logic initialization if needed, but it seems user wants real state)
+                // For safety, we keep initialization to avoid 'null' errors, but the stats will reflect it.
                 const demoUsers = [
-                    { uid: 'user_001', name: 'Demo User', email: 'demo@example.com', phone: '9876543210', password: 'demo123', role: 'user' },
-                    { uid: 'user_002', name: 'John Doe', email: 'john@example.com', phone: '9876543211', password: 'john123', role: 'user' }
+                    { uid: 'user_001', name: 'Demo User', email: 'demo@example.com', phone: '9876543210', password: 'demo123', role: 'user', stats: { totalScans: 0, totalPayments: 0, totalAmount: 0 } },
+                    { uid: 'user_002', name: 'John Doe', email: 'john@example.com', phone: '9876543211', password: 'john123', role: 'user', stats: { totalScans: 0, totalPayments: 0, totalAmount: 0 } }
                 ];
                 localStorage.setItem('voicebox_users', JSON.stringify(demoUsers));
             }
 
             // ==========================================
-            // 🚀 LIVE STATS SIMULATION
+            // 📊 REAL DATA CALCULATIONS (From LocalStorage)
             // ==========================================
 
-            // Base starting numbers (Realistic base)
-            let stats = {
-                users: 2450,
-                scans: 15890,
-                transactions: 8540
-            };
+            function getRealStats() {
+                // 1. Users (Exclude Admins)
+                const users = JSON.parse(localStorage.getItem('voicebox_users') || '[]');
+                const realUsers = users.filter(u => u.role !== 'admin');
+                const userCount = realUsers.length;
+
+                // 2. Scans (Sum from User Stats + Global Bills Backup)
+                let scanCount = 0;
+                // Sum from user profiles
+                realUsers.forEach(u => {
+                    if (u.stats && u.stats.totalScans) {
+                        scanCount += parseInt(u.stats.totalScans || 0);
+                    }
+                });
+                // Check standalone bills store (if any)
+                const bills = JSON.parse(localStorage.getItem('scannedBills') || '[]');
+                // Use whichever is higher (as bills might be stored anonymously or differently)
+                scanCount = Math.max(scanCount, bills.length);
+
+                // 3. Transactions (Sum from User Stats)
+                let transCount = 0;
+                realUsers.forEach(u => {
+                    if (u.stats && u.stats.totalPayments) {
+                        transCount += parseInt(u.stats.totalPayments || 0);
+                    }
+                });
+
+                return {
+                    users: userCount,
+                    scans: scanCount,
+                    transactions: transCount
+                };
+            }
+
+            const realData = getRealStats();
+
+            // ==========================================
+            // 🎬 ANIMATION (Count exact real numbers)
+            // ==========================================
 
             const userEl = document.getElementById('totalUsers');
             const scanEl = document.getElementById('totalScans');
             const transEl = document.getElementById('totalTransactions');
 
-            // Format number with commas (e.g., 1,234)
             const formatNum = (num) => new Intl.NumberFormat('en-IN').format(num);
 
-            // 1. Initial Count-Up Animation
             function animateValue(obj, start, end, duration) {
+                if (end === 0) {
+                    obj.innerHTML = "0";
+                    return;
+                }
                 let startTimestamp = null;
                 const step = (timestamp) => {
                     if (!startTimestamp) startTimestamp = timestamp;
@@ -344,44 +381,15 @@
                 window.requestAnimationFrame(step);
             }
 
-            // Start animation on load
-            animateValue(userEl, 0, stats.users, 2000);
-            animateValue(scanEl, 0, stats.scans, 2500);
-            animateValue(transEl, 0, stats.transactions, 3000);
+            // Animate to REAL numbers only
+            animateValue(userEl, 0, realData.users, 1500);
+            animateValue(scanEl, 0, realData.scans, 1500);
+            animateValue(transEl, 0, realData.transactions, 1500);
 
-            // 2. Random Live Updates (Simulates activity)
-            setInterval(() => {
-                // Randomly choose what to update
-                const rand = Math.random();
-
-                if (rand < 0.3) {
-                    // New User Joined
-                    stats.users += 1;
-                    userEl.textContent = formatNum(stats.users);
-                    // Flash effect
-                    userEl.style.color = '#6366f1';
-                    setTimeout(() => userEl.style.color = '', 500);
-                }
-                else if (rand < 0.7) {
-                    // Bill Scanned
-                    stats.scans += Math.floor(Math.random() * 3) + 1;
-                    scanEl.textContent = formatNum(stats.scans);
-                    // Flash effect
-                    scanEl.style.color = '#10b981'; // Green
-                    setTimeout(() => scanEl.style.color = '', 500);
-                }
-                else {
-                    // Transaction Made
-                    stats.transactions += Math.floor(Math.random() * 2) + 1;
-                    transEl.textContent = formatNum(stats.transactions);
-                    // Flash effect
-                    transEl.style.color = '#f59e0b'; // Orange
-                    setTimeout(() => transEl.style.color = '', 500);
-                }
-
-            }, 4000); // Update randomly every 4 seconds
+            // NO FAKE UPDATES: The numbers will only update on page refresh when data changes.
         });
     </script>
 </body>
 
 </html>
+```
