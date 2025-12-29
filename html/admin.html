@@ -264,6 +264,18 @@
                     }
                 }
             }
+
+            // ✅ AUTO-LOAD PROFILE ON START
+            (function loadSavedProfile() {
+                const user = JSON.parse(localStorage.getItem('voicebox_current_user') || '{}');
+                if (user.name) {
+                    document.getElementById('adminName').textContent = user.name;
+                    document.getElementById('adminAvatar').src = `https://ui-avatars.com/api/?name=${user.name}&background=6366f1&color=fff`;
+                }
+                if (user.email) {
+                    document.getElementById('adminEmail').textContent = user.email;
+                }
+            })();
         </script>
         </aside>
 
