@@ -141,14 +141,19 @@
                 <label>Email</label>
                 <input type="email" id="email" value="mohdubes8860@gmail.com" required>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="password" value="admin123" required>
-            </div>
-            <button type="submit">🔓 Access Admin Panel</button>
-        </form>
+            <label>Password</label>
+            <input type="password" id="password" value="admin123" required>
+    </div>
 
-        <div class="message" id="message"></div>
+    <div style="text-align: right; margin-bottom: 20px;">
+        <a href="#" id="forgotBtn" style="color: #dc2626; text-decoration: none; font-size: 13px;">Forgot Email or
+            Password?</a>
+    </div>
+
+    <button type="submit">🔓 Access Admin Panel</button>
+    </form>
+
+    <div class="message" id="message"></div>
     </div>
 
     <script>
@@ -158,6 +163,11 @@
             msg.className = 'message ' + type;
             msg.style.display = 'block';
         }
+
+        document.getElementById('forgotBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            alert('🔐 Recovery Info:\n\nEmail: mohdubes8860@gmail.com\nDefault Password: admin123\n\n(Tip: You can change this in html/admin-login.html)');
+        });
 
         document.getElementById('adminLoginForm').addEventListener('submit', function (e) {
             e.preventDefault();
