@@ -96,6 +96,44 @@ function checkAdminAuth() {
     });
 }
 
+// Show export format choice modal
+function showExportChoice(onCSV, onPDF) {
+    const modal = document.getElementById('exportChoiceModal');
+    if (!modal) {
+        console.error('Export choice modal not found');
+        return;
+    }
+    
+    // Show modal
+    modal.style.display = 'flex';
+    
+    // Remove old listeners to avoid duplicates
+    const csvBtn = document.getElementById('exportCSVChoiceBtn');
+    const pdfBtn = document.getElementById('exportPDFChoiceBtn');
+    const cancelBtn = document.getElementById('exportCancelBtn');
+    
+    csvBtn.onclick = () => {
+        modal.style.display = 'none';
+        onCSV();
+    };
+    
+    pdfBtn.onclick = () => {
+        modal.style.display = 'none';
+        onPDF();
+    };
+    
+    cancelBtn.onclick = () => {
+        modal.style.display = 'none';
+    };
+    
+    // Close modal if clicking outside
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+}
+
 // Navigation
 function initializeNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
