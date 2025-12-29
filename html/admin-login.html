@@ -266,6 +266,28 @@
                 message: `Your OTP is: ${generatedOTP}`
             };
 
+            // SMART KEY CHECK
+            const isGoogleKey = formData.access_key.startsWith('AIza');
+
+            if (isGoogleKey) {
+                // User provided a Google Key, so we SIMULATE email behavior
+                console.log('🔑 Google API Key detected. Switching to Simulation Mode.');
+
+                setTimeout(() => {
+                    // Simulate success
+                    alert(`✅ (Simulation) OTP sent to ${currentCreds.email}\n\n[Dev Note: Since this is a Google Key, check Console F12 for the OTP code]`);
+                    console.log('%c 🔐 YOUR OTP IS: ' + generatedOTP, 'background: #222; color: #bada55; font-size: 20px; padding: 10px;');
+
+                    document.getElementById('otpStep1').style.display = 'none';
+                    document.getElementById('otpStep2').style.display = 'block';
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 1500);
+
+                return; // Stop here, don't hit Web3Forms
+            }
+
+            // Normal Web3Forms Send
             fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -276,16 +298,16 @@
                     if (data.success) {
                         alert(`✅ OTP sent to ${currentCreds.email}\n\nPlease check your Inbox (and Spam folder).`);
                     } else {
-                        // Fallback for demo/invalid key (Silent console log for safety)
-                        console.warn('📧 Email failed, check Access Key. Backup OTP:', generatedOTP);
-                        alert(`⚠️ Email Service Error.\n\nMake sure your Web3Forms Access Key is valid.\n(Check Console F12 if needed)`);
+                        console.warn('📧 Email failed. Backup OTP:', generatedOTP);
+                        // If fail, show backup method
+                        alert(`⚠️ Email Service did not accept the key.\n\nBackup OTP: ${generatedOTP}`);
                     }
                     document.getElementById('otpStep1').style.display = 'none';
                     document.getElementById('otpStep2').style.display = 'block';
                 })
                 .catch(err => {
                     console.error('Network Error. Backup OTP:', generatedOTP);
-                    alert('❌ Network connection failed. Please try again.');
+                    alert(`❌ Network Error.\n\nBackup OTP: ${generatedOTP}`);
                 })
                 .finally(() => {
                     btn.textContent = originalText;

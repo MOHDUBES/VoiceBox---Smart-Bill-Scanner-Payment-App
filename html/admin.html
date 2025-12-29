@@ -250,17 +250,28 @@
                             message: `Hello ${newName},\n\nYour Admin Panel password was just changed.\n\nTime: ${new Date().toLocaleString()}\n\nIf this wasn't you, please reset it immediately.`
                         };
 
-                        fetch('https://api.web3forms.com/submit', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(formData)
-                        })
-                            .then(() => alert('✅ Password Updated! Security Alert sent to email.'))
-                            .catch(() => alert('✅ Password Updated! (Email alert failed - Demo Key)'))
-                            .finally(() => {
+                        // SMART KEY CHECK
+                        if (formData.access_key.startsWith('AIza')) {
+                            // Simulation Mode for Google Key
+                            setTimeout(() => {
+                                alert('✅ Password Updated! (Google Key detected - Email Simulated)');
                                 document.getElementById('profileModal').style.display = 'none';
                                 btn.textContent = originalText;
-                            });
+                            }, 1000);
+                        } else {
+                            // Normal Send
+                            fetch('https://api.web3forms.com/submit', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(formData)
+                            })
+                                .then(() => alert('✅ Password Updated! Security Alert sent to email.'))
+                                .catch(() => alert('✅ Password Updated! (Email alert failed - Demo Key)'))
+                                .finally(() => {
+                                    document.getElementById('profileModal').style.display = 'none';
+                                    btn.textContent = originalText;
+                                });
+                        }
 
                     } else {
                         document.getElementById('profileModal').style.display = 'none';
