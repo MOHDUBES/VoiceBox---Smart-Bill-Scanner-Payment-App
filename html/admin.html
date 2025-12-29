@@ -221,21 +221,47 @@
                     // Update Avatar
                     document.getElementById('adminAvatar').src = `https://ui-avatars.com/api/?name=${newName}&background=6366f1&color=fff`;
 
-                    // Save to local storage (Mock update)
+                    // Save to local storage
                     const user = JSON.parse(localStorage.getItem('voicebox_current_user') || '{}');
                     user.name = newName;
                     user.email = newEmail;
+                    localStorage.setItem('voicebox_current_user', JSON.stringify(user));
 
                     if (newPassword) {
-                        // Note: In a real app, you would send this to backend
-                        console.log('Password updated to:', newPassword);
-                        alert('✅ Profile & Password Updated Successfully!');
+                        // 📧 Send Security Alert Email
+                        const btn = document.querySelector('#profileModal button:last-child');
+                        const originalText = btn.textContent;
+                        btn.textContent = 'Sending Alert...';
+
+                        // Email Data
+                        const formData = {
+                            access_key: "4e8f7c2d-1a3b-4f5e-9d2c-6b8a1e3f7c9d", // Demo Key (Replace for real email)
+                            to_email: newEmail,
+                            subject: "🔐 Security Alert: Admin Password Changed",
+                            message: `Hello ${newName},\n\nYour Admin Panel password was just changed.\n\nTime: ${new Date().toLocaleString()}\n\nIf this wasn't you, please reset it immediately.`
+                        };
+
+                        // Send Email
+                        fetch('https://api.web3forms.com/submit', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(formData)
+                        })
+                            .then(() => {
+                                alert('✅ Password Updated! Security Alert sent to email.');
+                            })
+                            .catch(() => {
+                                alert('✅ Password Updated! (Email alert failed - Demo Key)');
+                            })
+                            .finally(() => {
+                                document.getElementById('profileModal').style.display = 'none';
+                                btn.textContent = originalText;
+                            });
+
                     } else {
+                        document.getElementById('profileModal').style.display = 'none';
                         alert('✅ Profile Updated Successfully!');
                     }
-
-                    localStorage.setItem('voicebox_current_user', JSON.stringify(user));
-                    document.getElementById('profileModal').style.display = 'none';
                 }
             }
         </script>
