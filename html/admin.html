@@ -5,6 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - OLD VERSION</title>
+
+    <!-- Prevent Browser Caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- VoiceBox App Icon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/voicebox-icon.png?v=2">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/voicebox-icon.png?v=2">
+    <link rel="apple-touch-icon" href="../assets/voicebox-icon.png?v=2">
+    <link rel="shortcut icon" href="../assets/voicebox-icon.png?v=2">
     <link rel="stylesheet" href="../css/admin.css?v=REALLY_OLD">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
@@ -36,7 +46,7 @@
                 alert('⛔ ACCESS DENIED!\n\nThis is a restricted area.\nOnly authorized administrators can access this page.\n\nRedirecting to login...');
 
                 // Redirect to admin login
-                window.location.href = 'admin-login-simple.html';
+                window.location.href = 'login.html';
 
                 // Stop page from loading
                 throw new Error('Unauthorized access');
@@ -59,6 +69,39 @@
             }, 100);
             setTimeout(() => clearInterval(checkPDF), 3000);
         });
+    </script>
+
+    <!-- Force Favicon Load -->
+    <script>
+        (function () {
+            // Remove any existing favicons
+            const existingIcons = document.querySelectorAll('link[rel*="icon"]');
+            existingIcons.forEach(icon => icon.remove());
+
+            // Add fresh favicon with timestamp
+            const timestamp = new Date().getTime();
+
+            const favicon32 = document.createElement('link');
+            favicon32.rel = 'icon';
+            favicon32.type = 'image/png';
+            favicon32.sizes = '32x32';
+            favicon32.href = '../assets/voicebox-icon.png?t=' + timestamp;
+            document.head.appendChild(favicon32);
+
+            const favicon16 = document.createElement('link');
+            favicon16.rel = 'icon';
+            favicon16.type = 'image/png';
+            favicon16.sizes = '16x16';
+            favicon16.href = '../assets/voicebox-icon.png?t=' + timestamp;
+            document.head.appendChild(favicon16);
+
+            const faviconShortcut = document.createElement('link');
+            faviconShortcut.rel = 'shortcut icon';
+            faviconShortcut.href = '../assets/voicebox-icon.png?t=' + timestamp;
+            document.head.appendChild(faviconShortcut);
+
+            console.log('✅ Favicon loaded with timestamp:', timestamp);
+        })();
     </script>
 </head>
 

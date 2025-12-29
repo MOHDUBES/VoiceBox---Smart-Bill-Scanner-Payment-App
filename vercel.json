@@ -7,7 +7,7 @@
         },
         {
             "source": "/admin",
-            "destination": "/html/admin-login.html",
+            "destination": "/html/login.html",
             "permanent": true
         }
     ]
