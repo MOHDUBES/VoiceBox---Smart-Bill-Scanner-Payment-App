@@ -302,43 +302,84 @@
     <!-- Initialize Demo Users if not already present -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize demo users for first-time login
+            // Initialize demo users if needed
             const existingUsers = localStorage.getItem('voicebox_users');
-
             if (!existingUsers) {
                 const demoUsers = [
-                    {
-                        uid: 'user_001',
-                        name: 'Demo User',
-                        email: 'demo@example.com',
-                        phone: '9876543210',
-                        password: 'demo123',
-                        role: 'user'
-                    },
-                    {
-                        uid: 'user_002',
-                        name: 'John Doe',
-                        email: 'john@example.com',
-                        phone: '9876543211',
-                        password: 'john123',
-                        role: 'user'
-                    },
-                    {
-                        uid: 'user_003',
-                        name: 'Jane Smith',
-                        email: 'jane@example.com',
-                        phone: '9876543212',
-                        password: 'jane123',
-                        role: 'user'
-                    }
+                    { uid: 'user_001', name: 'Demo User', email: 'demo@example.com', phone: '9876543210', password: 'demo123', role: 'user' },
+                    { uid: 'user_002', name: 'John Doe', email: 'john@example.com', phone: '9876543211', password: 'john123', role: 'user' }
                 ];
-
                 localStorage.setItem('voicebox_users', JSON.stringify(demoUsers));
-                console.log('✅ Demo users initialized! You can now login with:');
-                console.log('📧 demo@example.com / demo123');
-                console.log('📧 john@example.com / john123');
-                console.log('📧 jane@example.com / jane123');
             }
+
+            // ==========================================
+            // 🚀 LIVE STATS SIMULATION
+            // ==========================================
+
+            // Base starting numbers (Realistic base)
+            let stats = {
+                users: 2450,
+                scans: 15890,
+                transactions: 8540
+            };
+
+            const userEl = document.getElementById('totalUsers');
+            const scanEl = document.getElementById('totalScans');
+            const transEl = document.getElementById('totalTransactions');
+
+            // Format number with commas (e.g., 1,234)
+            const formatNum = (num) => new Intl.NumberFormat('en-IN').format(num);
+
+            // 1. Initial Count-Up Animation
+            function animateValue(obj, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    obj.innerHTML = formatNum(Math.floor(progress * (end - start) + start));
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+            // Start animation on load
+            animateValue(userEl, 0, stats.users, 2000);
+            animateValue(scanEl, 0, stats.scans, 2500);
+            animateValue(transEl, 0, stats.transactions, 3000);
+
+            // 2. Random Live Updates (Simulates activity)
+            setInterval(() => {
+                // Randomly choose what to update
+                const rand = Math.random();
+
+                if (rand < 0.3) {
+                    // New User Joined
+                    stats.users += 1;
+                    userEl.textContent = formatNum(stats.users);
+                    // Flash effect
+                    userEl.style.color = '#6366f1';
+                    setTimeout(() => userEl.style.color = '', 500);
+                }
+                else if (rand < 0.7) {
+                    // Bill Scanned
+                    stats.scans += Math.floor(Math.random() * 3) + 1;
+                    scanEl.textContent = formatNum(stats.scans);
+                    // Flash effect
+                    scanEl.style.color = '#10b981'; // Green
+                    setTimeout(() => scanEl.style.color = '', 500);
+                }
+                else {
+                    // Transaction Made
+                    stats.transactions += Math.floor(Math.random() * 2) + 1;
+                    transEl.textContent = formatNum(stats.transactions);
+                    // Flash effect
+                    transEl.style.color = '#f59e0b'; // Orange
+                    setTimeout(() => transEl.style.color = '', 500);
+                }
+
+            }, 4000); // Update randomly every 4 seconds
         });
     </script>
 </body>
