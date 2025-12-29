@@ -1,9 +1,14 @@
 {
-  "redirects": [
-    { 
-      "source": "/", 
-      "destination": "/html/login.html", 
-      "permanent": true 
-    }
-  ]
+    "redirects": [
+        {
+            "source": "/",
+            "destination": "/html/login.html",
+            "permanent": true
+        },
+        {
+            "source": "/admin",
+            "destination": "/html/admin-login.html",
+            "permanent": true
+        }
+    ]
 }
