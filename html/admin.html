@@ -217,42 +217,46 @@
                     // Update UI
                     document.getElementById('adminName').textContent = newName;
                     document.getElementById('adminEmail').textContent = newEmail;
-
-                    // Update Avatar
                     document.getElementById('adminAvatar').src = `https://ui-avatars.com/api/?name=${newName}&background=6366f1&color=fff`;
 
-                    // Save to local storage
-                    const user = JSON.parse(localStorage.getItem('voicebox_current_user') || '{}');
-                    user.name = newName;
-                    user.email = newEmail;
-                    localStorage.setItem('voicebox_current_user', JSON.stringify(user));
+                    // 1. Update Session User (For current session)
+                    const sessionUser = JSON.parse(localStorage.getItem('voicebox_current_user') || '{}');
+                    sessionUser.name = newName;
+                    sessionUser.email = newEmail;
+                    localStorage.setItem('voicebox_current_user', JSON.stringify(sessionUser));
+
+                    // 2. Update PERMANENT Credentials (For Login Page)
+                    // We get existing creds or default to hardcoded logic baseline
+                    const currentCreds = JSON.parse(localStorage.getItem('voicebox_admin_credentials') ||
+                        JSON.stringify({ email: 'mohdubes8860@gmail.com', password: 'admin123', name: 'Admin' }));
+
+                    currentCreds.name = newName;
+                    currentCreds.email = newEmail;
+                    if (newPassword) {
+                        currentCreds.password = newPassword;
+                    }
+                    localStorage.setItem('voicebox_admin_credentials', JSON.stringify(currentCreds));
 
                     if (newPassword) {
-                        // 📧 Send Security Alert Email
+                        // 📧 Send Security Alert Email logic...
                         const btn = document.querySelector('#profileModal button:last-child');
                         const originalText = btn.textContent;
                         btn.textContent = 'Sending Alert...';
 
-                        // Email Data
                         const formData = {
-                            access_key: "4e8f7c2d-1a3b-4f5e-9d2c-6b8a1e3f7c9d", // Demo Key (Replace for real email)
+                            access_key: "4e8f7c2d-1a3b-4f5e-9d2c-6b8a1e3f7c9d",
                             to_email: newEmail,
                             subject: "🔐 Security Alert: Admin Password Changed",
                             message: `Hello ${newName},\n\nYour Admin Panel password was just changed.\n\nTime: ${new Date().toLocaleString()}\n\nIf this wasn't you, please reset it immediately.`
                         };
 
-                        // Send Email
                         fetch('https://api.web3forms.com/submit', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(formData)
                         })
-                            .then(() => {
-                                alert('✅ Password Updated! Security Alert sent to email.');
-                            })
-                            .catch(() => {
-                                alert('✅ Password Updated! (Email alert failed - Demo Key)');
-                            })
+                            .then(() => alert('✅ Password Updated! Security Alert sent to email.'))
+                            .catch(() => alert('✅ Password Updated! (Email alert failed - Demo Key)'))
                             .finally(() => {
                                 document.getElementById('profileModal').style.display = 'none';
                                 btn.textContent = originalText;
@@ -267,7 +271,10 @@
 
             // ✅ AUTO-LOAD PROFILE ON START
             (function loadSavedProfile() {
-                const user = JSON.parse(localStorage.getItem('voicebox_current_user') || '{}');
+                // Check permanent storage first
+                const savedCreds = JSON.parse(localStorage.getItem('voicebox_admin_credentials'));
+                const user = savedCreds || JSON.parse(localStorage.getItem('voicebox_current_user') || '{}');
+
                 if (user.name) {
                     document.getElementById('adminName').textContent = user.name;
                     document.getElementById('adminAvatar').src = `https://ui-avatars.com/api/?name=${user.name}&background=6366f1&color=fff`;

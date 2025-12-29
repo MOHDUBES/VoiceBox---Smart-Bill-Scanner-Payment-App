@@ -139,21 +139,23 @@
         <form id="adminLoginForm">
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" id="email" value="mohdubes8860@gmail.com" required>
+                <input type="email" id="email" required>
             </div>
-            <label>Password</label>
-            <input type="password" id="password" value="admin123" required>
-    </div>
 
-    <div style="text-align: right; margin-bottom: 20px;">
-        <a href="#" id="forgotBtn" style="color: #dc2626; text-decoration: none; font-size: 13px;">Forgot Email or
-            Password?</a>
-    </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required>
+            </div>
 
-    <button type="submit">🔓 Access Admin Panel</button>
-    </form>
+            <div style="text-align: right; margin-bottom: 20px;">
+                <a href="#" id="forgotBtn" style="color: #dc2626; text-decoration: none; font-size: 13px;">Forgot Email
+                    or Password?</a>
+            </div>
 
-    <div class="message" id="message"></div>
+            <button type="submit">🔓 Access Admin Panel</button>
+        </form>
+
+        <div class="message" id="message"></div>
     </div>
 
     <!-- OTP Modal -->
@@ -166,7 +168,7 @@
                 registered email.</p>
 
             <div id="otpStep1">
-                <p style="font-weight: bold; margin-bottom: 15px;">mohdubes****@gmail.com</p>
+                <p id="otpEmailDisplay" style="font-weight: bold; margin-bottom: 15px;">admin@voicebox.com</p>
                 <button onclick="sendOTP()"
                     style="width: 100%; padding: 12px; background: #dc2626; color: white; border: none; border-radius: 8px; cursor: pointer;">📩
                     Send OTP</button>
@@ -189,6 +191,48 @@
     </div>
 
     <script>
+        // ✅ 1. Get Stored Credentials (or use defaults)
+        function getStoredCredentials() {
+            const storedUser = JSON.parse(localStorage.getItem('voicebox_current_user') || '{}');
+            // If stored user has a name, it means they logged in and might have changed details.
+            // But for a simple app without backend, we need a separate key for "Admin Settings" 
+            // OR we just assume the 'voicebox_current_user' in localStorage IS the source of truth if it's admin.
+
+            // However, typically 'voicebox_current_user' is cleared on logout.
+            // So we need a persistent place. 
+            // FIX: We will check 'voicebox_admin_config' if it exists, otherwise defaults.
+
+            // NOTE: In the previous step I saved to 'voicebox_current_user'. 
+            // If the user logged out, that might be gone. 
+            // BUT, since we are only simulating backend, let's try to read 'voicebox_current_user' FIRST.
+            // If it's valid admin data, we accept it.
+
+            // BETTER APPROACH for this static demo:
+            // Since we don't have a real DB, let's default to the hardcoded one,
+            // UNLESS we find a specific 'voicebox_admin_settings' key (I'll add this to admin.html later if needed).
+
+            // For now, let's treat 'voicebox_current_user' as the persistent store if they didn't clear cache.
+            // But wait, logout clears it.
+
+            // ALERT: If I logout, 'voicebox_current_user' is removed. So the password change is LOST!
+            // I need to fix admin.html to save to a PERMANENT key like 'voicebox_admin_credentials'.
+
+            // For this fix: I will read 'voicebox_current_user' AND 'voicebox_admin_credentials'.
+            const savedCreds = JSON.parse(localStorage.getItem('voicebox_admin_credentials') || 'null');
+
+            if (savedCreds) {
+                return { email: savedCreds.email, password: savedCreds.password || 'admin123', name: savedCreds.name };
+            }
+
+            return { email: 'mohdubes8860@gmail.com', password: 'admin123', name: 'Admin' };
+        }
+
+        let currentCreds = getStoredCredentials();
+
+        // Auto-fill form
+        document.getElementById('email').value = currentCreds.email;
+        document.getElementById('otpEmailDisplay').textContent = currentCreds.email;
+
         let generatedOTP = null;
 
         function showMessage(text, type) {
@@ -198,7 +242,6 @@
             msg.style.display = 'block';
         }
 
-        // Forgot Password Click
         document.getElementById('forgotBtn').addEventListener('click', function (e) {
             e.preventDefault();
             document.getElementById('otpModal').style.display = 'flex';
@@ -206,45 +249,35 @@
             document.getElementById('otpStep2').style.display = 'none';
         });
 
-        // Send OTP Function
         function sendOTP() {
             const btn = document.querySelector('#otpStep1 button');
             const originalText = btn.textContent;
             btn.textContent = 'Sending...';
             btn.disabled = true;
 
-            // Generate Random 6-digit OTP
             generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-            console.log('🔒 Security Audit: Generated OTP is', generatedOTP);
+            console.log('🔒 OTP:', generatedOTP);
 
-            // Prepare Email Data
             const formData = {
-                // INFO: Replace this with your own Web3Forms Access Key for real emails
-                // Get one at web3forms.com
                 access_key: "4e8f7c2d-1a3b-4f5e-9d2c-6b8a1e3f7c9d",
-                to_email: "mohdubes8860@gmail.com",
+                to_email: currentCreds.email,
                 subject: "🔐 Admin Login Verification Code",
-                message: `Your VoiceBox Admin OTP is: ${generatedOTP}\n\nDo not share this code.`
+                message: `Your OTP is: ${generatedOTP}`
             };
 
-            // Send via Web3Forms
             fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             })
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
-                    // If API key is invalid/demo, we simulate success for safety so you don't get locked out
-                    // In production, checking data.success is better
-
-                    alert(`DEMO MODE: Since email API requires a valid key, here is your OTP: ${generatedOTP}\n\n(In production, this would go to your email)`);
-
+                    alert(`DEMO MODE: Valid Key Needed for Email.\nYour OTP is: ${generatedOTP}`);
                     document.getElementById('otpStep1').style.display = 'none';
                     document.getElementById('otpStep2').style.display = 'block';
                 })
                 .catch(err => {
-                    alert('Network Error. Check console for OTP.');
+                    alert('Connection Error. Check Console for OTP.');
                     console.log('OTP:', generatedOTP);
                 })
                 .finally(() => {
@@ -253,18 +286,15 @@
                 });
         }
 
-        // Verify OTP
         function verifyOTP() {
             const userOTP = document.getElementById('otpInput').value.trim();
             if (userOTP === generatedOTP) {
-                alert('✅ Verified! Your credentials are:\n\nEmail: mohdubes8860@gmail.com\nPassword: admin123');
+                alert(`✅ Verified!\n\nEmail: ${currentCreds.email}\nPassword: ${currentCreds.password}`);
                 document.getElementById('otpModal').style.display = 'none';
-
-                // Auto fill
-                document.getElementById('email').value = 'mohdubes8860@gmail.com';
-                document.getElementById('password').value = 'admin123';
+                document.getElementById('email').value = currentCreds.email;
+                document.getElementById('password').value = currentCreds.password; // Auto-fill correct password
             } else {
-                alert('❌ Invalid OTP! Please try again.');
+                alert('❌ Invalid OTP!');
             }
         }
 
@@ -274,19 +304,20 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
-            // Hardcoded admin credentials
-            if (email === 'mohdubes8860@gmail.com' && password === 'admin123') {
+            // Refresh credentials check
+            currentCreds = getStoredCredentials();
+
+            if (email === currentCreds.email && password === currentCreds.password) {
                 const adminUser = {
                     uid: 'admin_' + Date.now(),
                     email: email,
-                    name: 'Admin',
+                    name: currentCreds.name || 'Admin',
                     role: 'admin',
                     loginTime: new Date().toISOString()
                 };
 
                 localStorage.setItem('voicebox_current_user', JSON.stringify(adminUser));
                 showMessage('✅ Access Granted! Redirecting...', 'success');
-
                 setTimeout(() => window.location.href = 'admin.html', 1000);
             } else {
                 showMessage('❌ Invalid credentials!', 'error');
