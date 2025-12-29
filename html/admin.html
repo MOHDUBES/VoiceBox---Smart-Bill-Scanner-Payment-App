@@ -125,12 +125,25 @@
             </nav>
 
             <div class="user-profile">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Admin">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Admin"
+                    id="adminAvatar">
                 <div class="user-info">
                     <h4 id="adminName">Admin User</h4>
-                    <p id="adminEmail">admin@voicebox.com</p>
+                    <p id="adminEmail"
+                        style="font-size: 11px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">
+                        admin@voicebox.com</p>
                 </div>
-                <button class="logout-btn" id="logoutBtn">
+
+                <!-- Edit Button -->
+                <button class="logout-btn" onclick="openProfileModal()" style="margin-right: 5px; color: #6366f1;"
+                    title="Edit Profile">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </button>
+
+                <button class="logout-btn" id="logoutBtn" title="Logout">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                         <polyline points="16 17 21 12 16 7" />
@@ -138,6 +151,71 @@
                     </svg>
                 </button>
             </div>
+        </aside>
+
+        <!-- Profile Edit Modal -->
+        <div id="profileModal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+            <div
+                style="background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                <h3 style="margin-bottom: 20px; color: #333;">✏️ Edit Admin Profile</h3>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Display
+                        Name</label>
+                    <input type="text" id="editName"
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Email
+                        Address</label>
+                    <input type="email" id="editEmail"
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button onclick="document.getElementById('profileModal').style.display='none'"
+                        style="padding: 10px 20px; background: #f3f4f6; border: none; border-radius: 6px; cursor: pointer;">Cancel</button>
+                    <button onclick="saveProfile()"
+                        style="padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer;">Save
+                        Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Load current details
+            function openProfileModal() {
+                document.getElementById('profileModal').style.display = 'flex';
+                document.getElementById('editName').value = document.getElementById('adminName').textContent;
+                document.getElementById('editEmail').value = document.getElementById('adminEmail').textContent;
+            }
+
+            // Save new details
+            function saveProfile() {
+                const newName = document.getElementById('editName').value;
+                const newEmail = document.getElementById('editEmail').value;
+
+                if (newName && newEmail) {
+                    // Update UI
+                    document.getElementById('adminName').textContent = newName;
+                    document.getElementById('adminEmail').textContent = newEmail;
+
+                    // Update Avatar
+                    document.getElementById('adminAvatar').src = `https://ui-avatars.com/api/?name=${newName}&background=6366f1&color=fff`;
+
+                    // Save to local storage (Mock update)
+                    const user = JSON.parse(localStorage.getItem('voicebox_current_user') || '{}');
+                    user.name = newName;
+                    user.email = newEmail;
+                    localStorage.setItem('voicebox_current_user', JSON.stringify(user));
+
+                    document.getElementById('profileModal').style.display = 'none';
+                    alert('✅ Profile Updated Successfully!');
+                }
+            }
+        </script>
         </aside>
 
         <!-- Main Content -->
@@ -443,8 +521,8 @@
             console.log('✅ Search input found:', searchInput);
 
             // Visual indicator that search is active
-            
-            
+
+
 
             searchInput.addEventListener('input', function (e) {
                 const searchTerm = e.target.value.toLowerCase().trim();
@@ -479,9 +557,9 @@
 
                 // Visual feedback
                 if (searchTerm) {
-                    
+
                 } else {
-                    
+
                 }
             });
 
@@ -491,6 +569,7 @@
     </script>
 
     <!-- ULTRA SIMPLE WORKING SEARCH -->
-    <script>(function(){'use strict';var c=0;function t(){c++;var i=document.getElementById('searchInput');if(i){console.log('SEARCH ON');i.onkeyup=function(){var s=this.value.toLowerCase(),f=0,r=document.querySelectorAll('table tbody tr');for(var j=0;j<r.length;j++){var x=r[j].textContent.toLowerCase();if(s===''||x.indexOf(s)>=0){r[j].style.display='';f++;}else{r[j].style.display='none';}}console.log('Found:'+f);};console.log('READY');return true;}if(c<30){setTimeout(t,200);}}t();})();</script></body>
+    <script>(function () { 'use strict'; var c = 0; function t() { c++; var i = document.getElementById('searchInput'); if (i) { console.log('SEARCH ON'); i.onkeyup = function () { var s = this.value.toLowerCase(), f = 0, r = document.querySelectorAll('table tbody tr'); for (var j = 0; j < r.length; j++) { var x = r[j].textContent.toLowerCase(); if (s === '' || x.indexOf(s) >= 0) { r[j].style.display = ''; f++; } else { r[j].style.display = 'none'; } } console.log('Found:' + f); }; console.log('READY'); return true; } if (c < 30) { setTimeout(t, 200); } } t(); })();</script>
+</body>
 
 </html>
