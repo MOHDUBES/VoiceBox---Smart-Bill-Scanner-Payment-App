@@ -124,32 +124,39 @@
                 </a>
             </nav>
 
-            <div class="user-profile">
+            <div class="user-profile" style="position: relative; padding-right: 50px;">
                 <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" alt="Admin"
                     id="adminAvatar">
                 <div class="user-info">
                     <h4 id="adminName">Admin User</h4>
                     <p id="adminEmail"
-                        style="font-size: 11px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">
+                        style="font-size: 11px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px;">
                         admin@voicebox.com</p>
                 </div>
 
-                <!-- Edit Button -->
-                <button class="logout-btn" onclick="openProfileModal()" style="margin-right: 5px; color: #6366f1;"
-                    title="Edit Profile">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                </button>
+                <!-- Action Buttons Container -->
+                <div
+                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; gap: 5px;">
+                    <!-- Edit Button -->
+                    <button class="logout-btn" onclick="openProfileModal()" style="padding: 5px; color: #6366f1;"
+                        title="Edit Profile">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
 
-                <button class="logout-btn" id="logoutBtn" title="Logout">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                </button>
+                    <!-- Logout Button -->
+                    <button class="logout-btn" id="logoutBtn" style="padding: 5px;" title="Logout">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </aside>
 
@@ -167,10 +174,17 @@
                         style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 15px;">
                     <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #666;">Email
                         Address</label>
                     <input type="email" id="editEmail"
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+
+                <div style="margin-bottom: 20px; border-top: 1px dashed #eee; padding-top: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #dc2626;">Change Password
+                        (Optional)</label>
+                    <input type="password" id="editPassword" placeholder="New Password"
                         style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
                 </div>
 
@@ -190,12 +204,14 @@
                 document.getElementById('profileModal').style.display = 'flex';
                 document.getElementById('editName').value = document.getElementById('adminName').textContent;
                 document.getElementById('editEmail').value = document.getElementById('adminEmail').textContent;
+                document.getElementById('editPassword').value = ''; // Clear password field
             }
 
             // Save new details
             function saveProfile() {
                 const newName = document.getElementById('editName').value;
                 const newEmail = document.getElementById('editEmail').value;
+                const newPassword = document.getElementById('editPassword').value;
 
                 if (newName && newEmail) {
                     // Update UI
@@ -209,10 +225,17 @@
                     const user = JSON.parse(localStorage.getItem('voicebox_current_user') || '{}');
                     user.name = newName;
                     user.email = newEmail;
-                    localStorage.setItem('voicebox_current_user', JSON.stringify(user));
 
+                    if (newPassword) {
+                        // Note: In a real app, you would send this to backend
+                        console.log('Password updated to:', newPassword);
+                        alert('✅ Profile & Password Updated Successfully!');
+                    } else {
+                        alert('✅ Profile Updated Successfully!');
+                    }
+
+                    localStorage.setItem('voicebox_current_user', JSON.stringify(user));
                     document.getElementById('profileModal').style.display = 'none';
-                    alert('✅ Profile Updated Successfully!');
                 }
             }
         </script>
