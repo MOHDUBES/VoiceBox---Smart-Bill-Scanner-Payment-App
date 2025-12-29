@@ -274,17 +274,23 @@
                 console.log('🔑 Google API Key detected. Switching to Simulation Mode.');
 
                 setTimeout(() => {
-                    // Simulate success
-                    alert(`✅ (Simulation) OTP sent to ${currentCreds.email}\n\n[Dev Note: Since this is a Google Key, check Console F12 for the OTP code]`);
-                    console.log('%c 🔐 YOUR OTP IS: ' + generatedOTP, 'background: #222; color: #bada55; font-size: 20px; padding: 10px;');
+                    // Show OTP on screen for easier access
+                    const enteredOTP = prompt(`(Simulation Mode)\n\nSince email sending requires a Web3Forms key, we are simulating the email.\n\nYour OTP is: ${generatedOTP}\n\nPlease enter the OTP below to verify:`, generatedOTP);
 
-                    document.getElementById('otpStep1').style.display = 'none';
-                    document.getElementById('otpStep2').style.display = 'block';
+                    if (enteredOTP) {
+                        document.getElementById('otpInput').value = enteredOTP;
+                        verifyOTP(); // Auto-verify if they clicked OK
+                    } else {
+                        // If they cancelled prompt, just show the input
+                        document.getElementById('otpStep1').style.display = 'none';
+                        document.getElementById('otpStep2').style.display = 'block';
+                    }
+
                     btn.textContent = originalText;
                     btn.disabled = false;
-                }, 1500);
+                }, 1000);
 
-                return; // Stop here, don't hit Web3Forms
+                return; // Stop here
             }
 
             // Normal Web3Forms Send

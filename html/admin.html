@@ -254,7 +254,7 @@
                         if (formData.access_key.startsWith('AIza')) {
                             // Simulation Mode for Google Key
                             setTimeout(() => {
-                                alert('✅ Password Updated! (Google Key detected - Email Simulated)');
+                                alert(`(Simulation Mode)\n\nPasssword Updated!\n\nEmail Content:\n"${formData.message}"`);
                                 document.getElementById('profileModal').style.display = 'none';
                                 btn.textContent = originalText;
                             }, 1000);
