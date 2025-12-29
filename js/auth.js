@@ -18,32 +18,11 @@ let db = null;
 let analytics = null;
 
 if (!isFirebaseConfigured) {
-    // Show helpful message
+    // Show helpful message in console only
     document.addEventListener('DOMContentLoaded', () => {
-        showToast('⚠️ Firebase not configured! Please add your Firebase config in auth.js file. Check ADMIN_SETUP.md for instructions.', 'error');
-        console.error(`
-╔════════════════════════════════════════════════════════════╗
-║           FIREBASE CONFIGURATION MISSING!                   ║
-╠════════════════════════════════════════════════════════════╣
-║  Please follow these steps:                                 ║
-║                                                             ║
-║  1. Go to Firebase Console:                                ║
-║     https://console.firebase.google.com/                   ║
-║                                                             ║
-║  2. Create a new project or select existing one            ║
-║                                                             ║
-║  3. Go to Project Settings → General                       ║
-║                                                             ║
-║  4. Scroll to "Your apps" → Click Web icon (</>)          ║
-║                                                             ║
-║  5. Copy the firebaseConfig object                         ║
-║                                                             ║
-║  6. Paste it in auth.js (line 2-11)                       ║
-║     Also paste in admin.js and app.js                      ║
-║                                                             ║
-║  📖 Full guide: Open ADMIN_SETUP.md or setup-guide.html   ║
-╚════════════════════════════════════════════════════════════╝
-        `);
+        console.warn('⚠️ Firebase not configured - Using LocalStorage mode (Demo)');
+        console.log('📝 To enable Firebase: Update firebaseConfig in auth.js');
+        // Removed intrusive toast - localStorage mode works fine without it
     });
 }
 
@@ -166,11 +145,25 @@ async function handleLogin(e) {
 
 // ===== LocalStorage Login (Demo Mode) =====
 function handleLocalStorageLogin(email, password, rememberMe) {
+    console.log('🔐 Attempting LocalStorage login...');
+    console.log('Email:', email);
+
     const users = JSON.parse(localStorage.getItem('voicebox_users') || '[]');
+    console.log('📊 Total users in database:', users.length);
+
+    // List all available emails for debugging
+    if (users.length > 0) {
+        console.log('📧 Available accounts:', users.map(u => u.email).join(', '));
+    } else {
+        console.warn('⚠️ No users found! Demo users not initialized.');
+    }
+
     const user = users.find(u => u.email === email && u.password === password);
 
     if (user) {
         // Login successful
+        console.log('✅ User found:', user.name);
+
         const userRole = user.role || 'user';
         const currentUser = {
             uid: user.uid,
@@ -183,34 +176,52 @@ function handleLocalStorageLogin(email, password, rememberMe) {
         // Save to session
         if (rememberMe) {
             localStorage.setItem('voicebox_current_user', JSON.stringify(currentUser));
+            console.log('💾 Saved to localStorage (Remember Me: ON)');
         } else {
             sessionStorage.setItem('voicebox_current_user', JSON.stringify(currentUser));
+            console.log('💾 Saved to sessionStorage (Remember Me: OFF)');
         }
 
-        showToast('✅ Login successful! (Demo Mode - No Firebase)', 'success');
+        showToast('✅ Login successful!', 'success');
         showLoading(false);
 
         // Show detailed notification
-        const loginNotification = `
-🎉 Login Successful!
-👤 User: ${user.name}
-📧 Email: ${user.email}
-🕐 Time: ${new Date().toLocaleTimeString('en-IN')}
-🔐 Mode: ${user.authProvider === 'google' ? 'Google' : 'Email/Password'}
-        `;
-        console.log(loginNotification);
+        console.log(`
+╔════════════════════════════════════╗
+║     LOGIN SUCCESSFUL! 🎉           ║
+╠════════════════════════════════════╣
+║ User: ${user.name.padEnd(30)}║
+║ Email: ${user.email.padEnd(29)}║
+║ Role: ${userRole.padEnd(30)}║
+║ Time: ${new Date().toLocaleTimeString('en-IN').padEnd(29)}║
+╚════════════════════════════════════╝
+        `);
 
         // Redirect
         setTimeout(() => {
             if (user.role === 'admin') {
+                console.log('🔄 Redirecting to admin panel...');
                 window.location.href = 'admin.html';
             } else {
+                console.log('🔄 Redirecting to user dashboard...');
                 window.location.href = 'index.html';
             }
         }, 1000);
     } else {
         showLoading(false);
-        showToast('❌ Invalid email or password. Try signing up first!', 'error');
+
+        console.error('❌ Login failed!');
+        console.error('Attempted email:', email);
+
+        // Check if email exists
+        const emailExists = users.find(u => u.email === email);
+        if (emailExists) {
+            console.error('⚠️ Email found but password incorrect!');
+            showToast('❌ Incorrect password!', 'error');
+        } else {
+            console.error('⚠️ Email not found in database!');
+            showToast('❌ Email not found! Please signup first or try demo@example.com', 'error');
+        }
     }
 }
 

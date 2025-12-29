@@ -233,10 +233,9 @@
                         <div class="password-strength" id="passwordStrength"></div>
                     </div>
 
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="termsAccept" required>
-                        <span>I agree to the <a href="#" class="link">Terms & Conditions</a></span>
-                    </label>
+
+                    <!-- Terms removed for easier signup -->
+
 
                     <!-- Admin signup option removed to keep admin creation private -->
 
@@ -305,7 +304,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize demo users for first-time login
             const existingUsers = localStorage.getItem('voicebox_users');
-            
+
             if (!existingUsers) {
                 const demoUsers = [
                     {

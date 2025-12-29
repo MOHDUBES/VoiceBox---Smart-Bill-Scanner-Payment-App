@@ -9,6 +9,57 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF library from unpkg - most reliable -->
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+    <!-- ADMIN ACCESS PROTECTION -->
+    <script>
+        // Check if user is admin BEFORE loading the page
+        (function checkAdminAccess() {
+            const currentUser = JSON.parse(
+                localStorage.getItem('voicebox_current_user') ||
+                sessionStorage.getItem('voicebox_current_user') ||
+                '{}'
+            );
+
+            // If NOT admin, redirect immediately
+            if (currentUser.role !== 'admin') {
+                console.warn('⛔ Unauthorized access attempt to admin panel!');
+                console.warn('Redirecting to login...');
+
+                // Clear any fake sessions
+                localStorage.removeItem('voicebox_current_user');
+                sessionStorage.removeItem('voicebox_current_user');
+
+                // Show alert
+                alert('⛔ ACCESS DENIED!\n\nThis is a restricted area.\nOnly authorized administrators can access this page.\n\nRedirecting to login...');
+
+                // Redirect to admin login
+                window.location.href = 'admin-login-simple.html';
+
+                // Stop page from loading
+                throw new Error('Unauthorized access');
+            }
+
+            console.log('✅ Admin access granted:', currentUser.email);
+        })();
+    </script>
+
+    <script>
+        // Test if jsPDF loaded
+        window.addEventListener('DOMContentLoaded', function () {
+            const checkPDF = setInterval(() => {
+                if (window.jspdf && window.jspdf.jsPDF) {
+                    console.log('✓ jsPDF loaded successfully');
+                    clearInterval(checkPDF);
+                } else {
+                    console.log('Waiting for jsPDF...');
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkPDF), 3000);
+        });
+    </script>
 </head>
 
 <body>
@@ -102,6 +153,7 @@
                             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
                         </svg>
                     </button>
+                    <!-- demo toggle removed; admin shows real data only -->
                     <div class="search-box">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -210,7 +262,10 @@
                 <div class="card">
                     <div class="card-header">
                         <h3>All Users</h3>
-                        <button class="btn-primary" id="exportUsersBtn">Export CSV</button>
+                        <button class="btn-primary" id="exportUsersBtn"
+                            style="display:flex; gap:0.5rem; align-items:center; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+                            📥 Export
+                        </button>
                     </div>
                     <div class="card-body">
                         <table class="data-table">
@@ -239,7 +294,10 @@
                 <div class="card">
                     <div class="card-header">
                         <h3>All Bill Scans</h3>
-                        <button class="btn-primary" id="exportScansBtn">Export CSV</button>
+                        <button class="btn-primary" id="exportScansBtn"
+                            style="display:flex; gap:0.5rem; align-items:center; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            📥 Export
+                        </button>
                     </div>
                     <div class="card-body">
                         <table class="data-table">
@@ -265,7 +323,10 @@
                 <div class="card">
                     <div class="card-header">
                         <h3>All Transactions</h3>
-                        <button class="btn-primary" id="exportPaymentsBtn">Export CSV</button>
+                        <button class="btn-primary" id="exportPaymentsBtn"
+                            style="display:flex; gap:0.5rem; align-items:center; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                            📥 Export
+                        </button>
                     </div>
                     <div class="card-body">
                         <table class="data-table">
@@ -321,13 +382,115 @@
         <p>Loading data...</p>
     </div>
 
+    <!-- Export Choice Modal -->
+    <div id="exportChoiceModal" class="modal hidden"
+        style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:9999;">
+        <div
+            style="background:#1a1a2e; padding:2.5rem; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.5); max-width:420px; width:90%; border: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="margin-bottom:0.5rem; color:#ffffff; font-size:1.5rem; font-weight: 700;">📥 Choose Export Format
+            </h3>
+            <p style="color:#a0a0b8; margin-bottom:2rem; font-size:0.95rem;">Select the format you want to download the
+                users data</p>
+            <div style="display:flex; gap:1rem; justify-content:center; margin-bottom: 1.5rem;">
+                <button id="exportCSVChoiceBtn"
+                    style="padding:1rem 1.8rem; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600; flex:1; font-size: 1rem; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);"
+                    onmouseover="this.style.transform='translateY(-2px)'"
+                    onmouseout="this.style.transform='translateY(0)'">
+                    📄 CSV File
+                </button>
+                <button id="exportPDFChoiceBtn"
+                    style="padding:1rem 1.8rem; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:600; flex:1; font-size: 1rem; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);"
+                    onmouseover="this.style.transform='translateY(-2px)'"
+                    onmouseout="this.style.transform='translateY(0)'">
+                    📕 PDF Report
+                </button>
+            </div>
+            <button id="exportCancelBtn"
+                style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.1); color:#a0a0b8; border:1px solid rgba(255,255,255,0.2); border-radius:10px; cursor:pointer; font-weight:500; font-size: 0.95rem; transition: all 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.color='#ffffff'"
+                onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#a0a0b8'">
+                Cancel
+            </button>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 
-    <script src="../js/admin.js"></script>
-</body>
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+    <script src="../js/admin.js?v=2.0"></script>
+    <script src="../js/admin-individual-downloads.js?v=2.0"></script>
+
+    <!-- INLINE SEARCH - FORCED TO WORK -->
+    <script>
+        // Force execution after everything loads
+        setTimeout(function () {
+            console.log('🔍 ADMIN SEARCH - Initializing...');
+
+            const searchInput = document.getElementById('searchInput');
+
+            if (!searchInput) {
+                console.error('❌ Search input NOT found!');
+                alert('Search input missing! Check admin.html line 163');
+                return;
+            }
+
+            console.log('✅ Search input found:', searchInput);
+
+            // Visual indicator that search is active
+            
+            
+
+            searchInput.addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const activePage = document.querySelector('.page.active');
+
+                if (!activePage) {
+                    console.warn('⚠️ No active page');
+                    return;
+                }
+
+                const activeTable = activePage.querySelector('table tbody');
+                if (!activeTable) {
+                    console.warn('⚠️ No table in active page:', activePage.id);
+                    return;
+                }
+
+                const rows = activeTable.querySelectorAll('tr');
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+
+                    if (!searchTerm || text.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                console.log(`🔍 Search: "${searchTerm}" → ${visibleCount} results`);
+
+                // Visual feedback
+                if (searchTerm) {
+                    
+                } else {
+                    
+                }
+            });
+
+            console.log('✅ SEARCH ACTIVE - Type to test!');
+
+        }, 2000); // Wait 2 seconds for everything to load
+    </script>
+
+    <!-- ULTRA SIMPLE WORKING SEARCH -->
+    <script>(function(){'use strict';var c=0;function t(){c++;var i=document.getElementById('searchInput');if(i){console.log('SEARCH ON');i.onkeyup=function(){var s=this.value.toLowerCase(),f=0,r=document.querySelectorAll('table tbody tr');for(var j=0;j<r.length;j++){var x=r[j].textContent.toLowerCase();if(s===''||x.indexOf(s)>=0){r[j].style.display='';f++;}else{r[j].style.display='none';}}console.log('Found:'+f);};console.log('READY');return true;}if(c<30){setTimeout(t,200);}}t();})();</script></body>
 
 </html>
