@@ -38,13 +38,6 @@ Email: demo@example.com
 Password: demo123
 ```
 
-**Admin Access:** (Keep it secret!)
-```
-File: html/admin-login.html
-Email: admin@voicebox.com
-Password: admin123
-```
-
 ⚠️ Change the admin password ASAP!
 
 ---
