@@ -56,6 +56,7 @@ if (isFirebaseConfigured) {
 }
 
 // ===== Initialize App =====
+// VoiceBox App - Version 2.1 (Manual Entry & Hindi Fixes)
 document.addEventListener('DOMContentLoaded', () => {
     initializeNavigation();
     initializeScanner();
