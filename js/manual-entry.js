@@ -119,6 +119,9 @@
             showToast('✅ Bill saved successfully!');
             modal.remove();
 
+            // Update last bill text for Replay functionality
+            window.lastBillText = billText;
+
             // Speak the bill
             setTimeout(() => {
                 if (typeof speakText === 'function') {

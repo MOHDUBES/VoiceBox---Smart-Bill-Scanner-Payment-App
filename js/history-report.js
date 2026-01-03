@@ -57,12 +57,16 @@
                     <tbody>
         `;
 
-        bills.reverse().forEach((bill, index) => {
-            const billId = bill.id || `scan_${String(index + 1).padStart(3, '0')}`;
+        // Loop backwards to show newest first, but keep stable IDs based on original index
+        for (let i = bills.length - 1; i >= 0; i--) {
+            const bill = bills[i];
+            // Use consistent ID format: scan_1, scan_2 etc. (based on original index)
+            const billId = bill.id || `scan_${i + 1}`;
+
             const date = bill.timestamp ? new Date(bill.timestamp).toLocaleString() : 'Invalid Date';
             const preview = bill.text ? bill.text.substring(0, 80) + '...' : 'No text';
 
-            // Extract amount from text (simple regex)
+            // Extract amount
             let amount = 'N/A';
             const amountMatch = bill.text?.match(/(?:₹|Rs\.?|INR)\s*(\d+(?:,\d+)*(?:\.\d{2})?)/i);
             if (amountMatch) {
@@ -71,7 +75,7 @@
 
             html += `
                 <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
-                    <td style="padding: 1rem; color: #64748b;">${bills.length - index}</td>
+                    <td style="padding: 1rem; color: #64748b;">${i + 1}</td>
                     <td style="padding: 1rem; font-weight: 600; color: #334155;">${billId}</td>
                     <td style="padding: 1rem; color: #64748b; font-size: 0.9rem;">${date}</td>
                     <td style="padding: 1rem; color: #64748b; font-size: 0.85rem; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${preview}</td>
@@ -86,7 +90,7 @@
                     </td>
                 </tr>
             `;
-        });
+        }
 
         html += `
                     </tbody>
@@ -108,7 +112,7 @@
         let csv = 'Bill ID,Date,Text,Amount\n';
 
         bills.forEach((bill, index) => {
-            const billId = bill.id || `scan_${String(index + 1).padStart(3, '0')}`;
+            const billId = bill.id || `scan_${index + 1}`;
             const date = bill.timestamp ? new Date(bill.timestamp).toLocaleString() : 'Invalid Date';
             const text = (bill.text || '').replace(/"/g, '""').replace(/\n/g, ' ');
 
@@ -148,7 +152,7 @@
         pdfContent += `Total Bills: ${bills.length}\n\n`;
 
         bills.forEach((bill, index) => {
-            const billId = bill.id || `scan_${String(index + 1).padStart(3, '0')}`;
+            const billId = bill.id || `scan_${index + 1}`;
             const date = bill.timestamp ? new Date(bill.timestamp).toLocaleString() : 'Invalid Date';
 
             pdfContent += '-'.repeat(80) + '\n';
@@ -172,7 +176,8 @@
     // View bill details
     window.viewBillDetails = function (billId) {
         const bills = JSON.parse(localStorage.getItem('scannedBills')) || [];
-        const bill = bills.find(b => (b.id || `scan_${bills.indexOf(b) + 1}`) === billId);
+        // Consistent lookup: manual ID OR scan_{index+1}
+        const bill = bills.find((b, i) => (b.id || `scan_${i + 1}`) === billId);
 
         if (!bill) {
             alert('Bill not found!');
@@ -283,8 +288,9 @@
         let bills = JSON.parse(localStorage.getItem('scannedBills')) || [];
         const originalLength = bills.length;
 
-        bills = bills.filter(b => {
-            const id = b.id || `scan_${bills.indexOf(b) + 1}`;
+        // Consistent lookup
+        bills = bills.filter((b, i) => {
+            const id = b.id || `scan_${i + 1}`;
             return id !== billId;
         });
 
@@ -300,7 +306,8 @@
     // Download single bill
     window.downloadSingleBill = function (billId) {
         const bills = JSON.parse(localStorage.getItem('scannedBills')) || [];
-        const bill = bills.find(b => (b.id || `scan_${bills.indexOf(b) + 1}`) === billId);
+        // Consistent lookup
+        const bill = bills.find((b, i) => (b.id || `scan_${i + 1}`) === billId);
 
         if (!bill) {
             alert('Bill not found!');
@@ -335,9 +342,16 @@
     setTimeout(checkAndLoadHistory, 1000);
 
     // Listen for section changes
+    // Listen for section changes - Enhanced for Mobile
     document.addEventListener('click', function (e) {
-        if (e.target.matches('[data-section="history"]')) {
+        // Use closest() to handle mobile touches on icons
+        if (e.target.closest('[data-section="history"]')) {
+            console.log('📱 Mobile History Navigation');
             setTimeout(displayBillHistoryReport, 300);
+        }
+        // Also handle tab clicks
+        if (e.target.closest('[data-history-tab="bills"]')) {
+            setTimeout(displayBillHistoryReport, 100);
         }
     });
 })();
