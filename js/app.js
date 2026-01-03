@@ -348,6 +348,8 @@ function initializeScanner() {
     // Language selection
     languageSelect.addEventListener('change', (e) => {
         currentLanguage = e.target.value;
+        window.currentLanguage = e.target.value; // Update global variable too
+        console.log('🌐 Language changed to:', e.target.value);
         showToast('Language changed to ' + e.target.options[e.target.selectedIndex].text);
     });
 
@@ -432,60 +434,47 @@ async function scanBill() {
     loading.classList.remove('hidden');
 
     try {
-        // Try Hindi+English first for Indian bills
-        console.log('🔍 Starting OCR with Hindi+English support...');
-        showToast('📄 Reading bill text...');
+        console.log('🔍 Starting enhanced OCR...');
+        showToast('📄 Processing image...');
+
+        // Preprocess image for better OCR
+        const processedImage = await preprocessImage(currentBillImage);
+
+        console.log('✅ Image preprocessed');
+        showToast('📖 Reading bill text...');
 
         let text = '';
         let ocrSuccess = false;
 
-        // Try with Hindi + English (best for Indian bills)
-        try {
-            const result = await Tesseract.recognize(
-                currentBillImage,
-                'hin+eng',
-                {
-                    logger: m => {
-                        if (m.status === 'recognizing text') {
-                            const progress = Math.round(m.progress * 100);
-                            console.log('OCR Progress:', progress + '%');
-                            if (progress % 25 === 0) {
-                                showToast(`📖 Reading... ${progress}%`);
-                            }
-                        }
+        // Enhanced Tesseract config for better accuracy
+        const tesseractConfig = {
+            lang: 'eng',
+            logger: m => {
+                if (m.status === 'recognizing text') {
+                    const progress = Math.round(m.progress * 100);
+                    if (progress % 20 === 0) {
+                        showToast(`📖 Reading... ${progress}%`);
                     }
                 }
-            );
+            },
+            // Enhanced OCR parameters
+            tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz₹/-:.,() ',
+            tessedit_pageseg_mode: Tesseract.PSM.AUTO,
+            preserve_interword_spaces: '1'
+        };
+
+        try {
+            const result = await Tesseract.recognize(processedImage, tesseractConfig.lang, tesseractConfig);
             text = result.data.text;
             ocrSuccess = true;
-            console.log('✅ OCR Success with Hindi+English');
-        } catch (hindiError) {
-            console.warn('⚠️ Hindi OCR failed, trying English only...', hindiError);
-
-            // Fallback to English only
-            try {
-                const result = await Tesseract.recognize(
-                    currentBillImage,
-                    'eng',
-                    {
-                        logger: m => {
-                            if (m.status === 'recognizing text') {
-                                console.log('OCR Progress (English):', Math.round(m.progress * 100) + '%');
-                            }
-                        }
-                    }
-                );
-                text = result.data.text;
-                ocrSuccess = true;
-                console.log('✅ OCR Success with English only');
-            } catch (engError) {
-                console.error('❌ Both OCR attempts failed:', engError);
-                throw new Error('OCR failed for both Hindi and English');
-            }
+            console.log('✅ OCR Success');
+        } catch (error) {
+            console.error('❌ OCR failed:', error);
+            throw new Error('OCR processing failed');
         }
 
-        // Clean up the text
-        text = text.trim();
+        // Post-process text to fix common OCR errors
+        text = postProcessOCRText(text);
 
         currentBillText = text;
         document.getElementById('scannedText').textContent = text || 'No text detected';
@@ -497,6 +486,10 @@ async function scanBill() {
             showToast('✅ Bill scanned successfully!');
             console.log('📄 Extracted text:', text.substring(0, 100) + '...');
             console.log('📏 Text length:', text.length, 'characters');
+
+            // Store for replay
+            window.lastBillText = text;
+            console.log('💾 Bill text stored for replay');
 
             // Speak the actual bill content
             setTimeout(() => {
@@ -514,6 +507,78 @@ async function scanBill() {
         previewArea.classList.remove('hidden');
     }
 }
+
+// Image preprocessing for better OCR
+async function preprocessImage(imageSource) {
+    return new Promise((resolve) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+
+        img.onload = () => {
+            // Set canvas size
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Draw original image
+            ctx.drawImage(img, 0, 0);
+
+            // Get image data
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            // Enhance contrast and brightness
+            for (let i = 0; i < data.length; i += 4) {
+                // Increase contrast
+                const contrast = 1.3;
+                data[i] = ((data[i] - 128) * contrast) + 128;     // Red
+                data[i + 1] = ((data[i + 1] - 128) * contrast) + 128; // Green
+                data[i + 2] = ((data[i + 2] - 128) * contrast) + 128; // Blue
+
+                // Convert to grayscale for better OCR
+                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+                // Apply threshold for sharper text
+                const threshold = avg > 128 ? 255 : 0;
+                data[i] = threshold;
+                data[i + 1] = threshold;
+                data[i + 2] = threshold;
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+            resolve(canvas.toDataURL());
+        };
+
+        img.src = imageSource;
+    });
+}
+
+// Post-process OCR text to fix common errors
+function postProcessOCRText(text) {
+    let processed = text;
+
+    // Fix common OCR mistakes
+    processed = processed.replace(/[X×xX]\s*(\d)/g, '₹$1');  // X40 → ₹40
+    processed = processed.replace(/Rs\.?\s*(\d)/gi, '₹$1');   // Rs 40 → ₹40
+    processed = processed.replace(/INR\s*(\d)/gi, '₹$1');     // INR 40 → ₹40
+
+    // Fix date format issues
+    processed = processed.replace(/(\d{2})\/0\/(\d{4})/g, '$1/01/$2'); // 03/0/2026 → 03/01/2026
+
+    // Fix common letter-number confusions
+    processed = processed.replace(/\bTL\b/g, '1L');   // TL → 1L
+    processed = processed.replace(/\bO(\d)/g, '0$1'); // O5 → 05
+    processed = processed.replace(/(\d)O\b/g, '$10'); // 5O → 50
+
+    // Fix spacing in invoice numbers
+    processed = processed.replace(/Rf\s*1\s+(\d+)/g, 'RF1$1'); // Rf1 2345 → RF12345
+
+    // Clean up excessive spaces
+    processed = processed.replace(/\s+/g, ' ').trim();
+
+    return processed;
+}
+
 
 function getOCRLanguage(lang) {
     const langMap = {

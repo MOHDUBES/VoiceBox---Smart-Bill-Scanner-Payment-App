@@ -23,12 +23,24 @@ window.speakTextSimple = function (text, customLang) {
     // Convert numbers to Hindi/Urdu words if needed
     let processedText = text;
     if (lang.startsWith('hi') || lang.startsWith('ur')) {
-        if (typeof HindiNumberConverter !== 'undefined') {
-            console.log('🔄 Converting numbers to Hindi words...');
-            processedText = HindiNumberConverter.convertForHindiSpeech(text);
-            console.log('  Converted preview:', processedText.substring(0, 80) + '...');
+        // Check if text contains Hindi/Devanagari characters
+        const hasHindiChars = /[\u0900-\u097F]/.test(text);
+
+        if (hasHindiChars) {
+            // Text is already in Hindi - only convert English numbers if present
+            console.log('📝 Text contains Hindi characters - converting only English numbers');
+            if (typeof HindiNumberConverter !== 'undefined') {
+                processedText = HindiNumberConverter.convertForHindiSpeech(text);
+            }
         } else {
-            console.warn('⚠️ HindiNumberConverter not loaded');
+            // Text is in English - convert numbers to Hindi
+            console.log('🔄 Converting English numbers to Hindi words...');
+            if (typeof HindiNumberConverter !== 'undefined') {
+                processedText = HindiNumberConverter.convertForHindiSpeech(text);
+                console.log('  Converted preview:', processedText.substring(0, 80) + '...');
+            } else {
+                console.warn('⚠️ HindiNumberConverter not loaded');
+            }
         }
     }
 

@@ -9,11 +9,12 @@
     window.replayLastBill = function () {
         if (!window.lastBillText || window.lastBillText === '') {
             showToast('⚠️ No bill to replay');
-            alert('No bill scanned yet!\n\nPlease scan a bill first.');
+            console.warn('No bill text available for replay');
             return;
         }
 
         console.log('🔊 Replaying bill...');
+        console.log('📝 Text length:', window.lastBillText.length);
         showToast('🔊 Replaying bill...');
 
         // Stop any ongoing speech
@@ -21,15 +22,22 @@
             window.speechSynthesis.cancel();
         }
 
-        // Speak the text again
-        if (typeof speakText === 'function') {
-            speakText(window.lastBillText);
+        // Get current language
+        const currentLang = window.currentLanguage || document.getElementById('language')?.value || 'en-US';
+        console.log('🌐 Replay language:', currentLang);
+
+        // Speak the text again using the global function
+        if (typeof window.speakText === 'function') {
+            window.speakText(window.lastBillText, currentLang);
+        } else if (typeof speakText === 'function') {
+            speakText(window.lastBillText, currentLang);
         } else {
-            // Fallback
+            // Fallback to direct speech synthesis
+            console.log('⚠️ Using fallback speech');
             const speech = new SpeechSynthesisUtterance(window.lastBillText);
-            speech.lang = document.getElementById('language')?.value || 'en-US';
-            speech.rate = 0.9;
-            speech.pitch = 1;
+            speech.lang = currentLang;
+            speech.rate = 0.85;
+            speech.pitch = 1.0;
             window.speechSynthesis.speak(speech);
         }
 
@@ -82,7 +90,7 @@
             this.style.boxShadow = '0 8px 24px rgba(102, 126, 234, 0.4)';
         };
 
-        btn.onclick = replayLastBill;
+        btn.onclick = window.replayLastBill;
 
         document.body.appendChild(btn);
         console.log('✅ Floating replay button added');

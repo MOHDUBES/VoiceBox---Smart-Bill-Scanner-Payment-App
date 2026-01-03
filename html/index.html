@@ -150,6 +150,15 @@
                                 </svg>
                                 Scan Bill
                             </button>
+                            <button class="btn-primary" onclick="showManualEntryModal()"
+                                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                ✍️ Manual Entry
+                            </button>
                             <button class="btn-secondary" id="cancelBtn">Cancel</button>
                         </div>
                     </div>
@@ -173,8 +182,8 @@
                         <div class="translation-controls"
                             style="margin-top: 1rem; padding: 1.25rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 12px;">
                             <label
-                                style="font-size: 0.9rem; color: #a0a0b8; margin-bottom: 0.75rem; display: block; font-weight: 600;">🌍
-                                Translate & Listen In:</label>
+                                style="font-size: 0.9rem; color: #a0a0b8; margin-bottom: 0.75rem; display: block; font-weight: 600;">
+                                Select Language:</label>
                             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                                 <select id="translateTargetScanner" class="select-input"
                                     style="flex: 1; min-width: 150px; padding: 0.6rem; background: #1a1a2e; color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;">
@@ -188,9 +197,9 @@
                                     <option value="ja-JP">Japanese</option>
                                 </select>
                                 <button class="btn-primary"
-                                    onclick="translateAndSpeak(document.getElementById('scannedText').textContent, document.getElementById('translateTargetScanner').value)"
+                                    onclick="speakText(document.getElementById('scannedText').textContent, document.getElementById('translateTargetScanner').value)"
                                     style="padding: 0.6rem 1.25rem; border-radius: 8px; background: #6366f1;">
-                                    🚀 Translate & Suniye
+                                    🔊 Listen
                                 </button>
                             </div>
                         </div>
@@ -249,25 +258,9 @@
 
                 <!-- Bill History Tab -->
                 <div class="history-tab-content" id="billsHistory">
-                    <div class="history-controls">
-                        <input type="text" class="search-input" id="searchInput" placeholder="Search bills...">
-                        <button class="btn-secondary" id="clearHistoryBtn">Clear All</button>
-                    </div>
-
-                    <div class="history-grid" id="historyGrid">
-                        <!-- History items will be dynamically added here -->
-                    </div>
-
-                    <div class="empty-state" id="emptyState">
-                        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                            <polyline points="14 2 14 8 20 8" />
-                            <line x1="12" y1="18" x2="12" y2="12" />
-                            <line x1="9" y1="15" x2="15" y2="15" />
-                        </svg>
-                        <h3>No Bills Yet</h3>
-                        <p>Start scanning bills to see them here</p>
+                    <!-- Reporting View Container -->
+                    <div id="historyContainer">
+                        <!-- Enhanced reporting table will be loaded here by history-report.js -->
                     </div>
                 </div>
 
@@ -1292,6 +1285,9 @@
     <script src="../js/translator.js"></script>
     <script src="../js/hindi-number-converter.js"></script>
     <script src="../js/voice-simple.js"></script>
+    <script src="../js/speech-test.js"></script>
+    <script src="../js/manual-entry.js"></script>
+    <script src="../js/history-report.js"></script>
     <script src="../js/payment-security.js"></script>
     <script src="../js/receipt-generator.js"></script>
     <script src="../js/maps.js"></script>
