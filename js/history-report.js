@@ -176,8 +176,8 @@
     // View bill details
     window.viewBillDetails = function (billId) {
         const bills = JSON.parse(localStorage.getItem('scannedBills')) || [];
-        // Consistent lookup: manual ID OR scan_{index+1}
-        const bill = bills.find((b, i) => (b.id || `scan_${i + 1}`) === billId);
+        // Consistent lookup: manual ID OR scan_{index+1} (String comparison)
+        const bill = bills.find((b, i) => String(b.id || `scan_${i + 1}`) === String(billId));
 
         if (!bill) {
             alert('Bill not found!');
@@ -291,7 +291,7 @@
         // Consistent lookup
         bills = bills.filter((b, i) => {
             const id = b.id || `scan_${i + 1}`;
-            return id !== billId;
+            return String(id) !== String(billId);
         });
 
         if (bills.length < originalLength) {
@@ -307,7 +307,7 @@
     window.downloadSingleBill = function (billId) {
         const bills = JSON.parse(localStorage.getItem('scannedBills')) || [];
         // Consistent lookup
-        const bill = bills.find((b, i) => (b.id || `scan_${i + 1}`) === billId);
+        const bill = bills.find((b, i) => String(b.id || `scan_${i + 1}`) === String(billId));
 
         if (!bill) {
             alert('Bill not found!');
