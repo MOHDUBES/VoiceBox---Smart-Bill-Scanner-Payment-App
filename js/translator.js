@@ -39,44 +39,94 @@ window.translateAndSpeak = async function (text, targetLangCode) {
         return;
     }
 
+    console.log('🌐 Translation Request:');
+    console.log('  📝 Text length:', text.length, 'characters');
+    console.log('  🎯 Target language:', targetLangCode);
+    console.log('  📄 Text preview:', text.substring(0, 100) + '...');
+
     showToast('🌐 Translating to ' + targetLangCode.split('-')[0].toUpperCase() + '...');
 
     try {
         const translatedText = await TranslationService.translate(text, targetLangCode);
 
+        console.log('✅ Translation Result:');
+        console.log('  📝 Translated length:', translatedText.length, 'characters');
+        console.log('  📄 Translated preview:', translatedText.substring(0, 100) + '...');
+
         if (translatedText === text) {
-            showToast('⚠️ Using original text (Translation failed)');
+            showToast('⚠️ Using original text (Translation may have failed)');
+            console.warn('⚠️ Translation returned same text - using original');
         } else {
-            showToast('✅ Translation Ready');
+            showToast('✅ Translation Ready - Now Speaking...');
         }
 
-        // Wait a bit for voices to be ready if they aren't
-        if (window.speechSynthesis.getVoices().length === 0) {
+        // Ensure voices are loaded before speaking
+        let voices = window.speechSynthesis.getVoices();
+        if (voices.length === 0) {
+            console.log('⏳ Waiting for voices to load...');
             await new Promise(resolve => {
-                window.speechSynthesis.onvoiceschanged = resolve;
-                // Timeout after 1s
-                setTimeout(resolve, 1000);
+                window.speechSynthesis.onvoiceschanged = () => {
+                    console.log('✅ Voices loaded');
+                    resolve();
+                };
+                // Timeout after 2 seconds
+                setTimeout(() => {
+                    console.log('⚠️ Voice loading timeout - proceeding anyway');
+                    resolve();
+                }, 2000);
             });
         }
 
+        // Use speakText function if available
         if (typeof speakText === 'function') {
             const originalLang = window.currentLanguage;
+
+            console.log('🔄 Switching language:');
+            console.log('  From:', originalLang);
+            console.log('  To:', targetLangCode);
+
+            // Set the target language globally
             window.currentLanguage = targetLangCode;
 
-            console.log('🔊 Speaking translated text in:', targetLangCode);
+            // Small delay to ensure language is set
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            console.log('🔊 Calling speakText with translated content...');
             speakText(translatedText);
 
-            // Reset language after a short delay to ensure speakText used it
+            // Reset language after speech starts (longer delay)
             setTimeout(() => {
                 window.currentLanguage = originalLang;
-            }, 100);
+                console.log('🔄 Language reset to:', originalLang);
+            }, 500);
         } else {
+            // Fallback: Direct speech synthesis
+            console.log('⚠️ speakText function not found, using direct synthesis');
+
             const utterance = new SpeechSynthesisUtterance(translatedText);
             utterance.lang = targetLangCode;
+            utterance.rate = 0.85;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+
+            // Try to find appropriate voice
+            const voices = window.speechSynthesis.getVoices();
+            const langCode = targetLangCode.split('-')[0];
+            const matchingVoice = voices.find(v => v.lang.startsWith(langCode));
+
+            if (matchingVoice) {
+                utterance.voice = matchingVoice;
+                console.log('🎤 Using voice:', matchingVoice.name);
+            }
+
+            utterance.onstart = () => console.log('🔊 Speech started');
+            utterance.onend = () => console.log('✅ Speech completed');
+            utterance.onerror = (e) => console.error('❌ Speech error:', e.error);
+
             window.speechSynthesis.speak(utterance);
         }
     } catch (error) {
-        console.error('Translation process error:', error);
+        console.error('❌ Translation process error:', error);
         showToast('❌ Translation service error');
     }
 };

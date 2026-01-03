@@ -607,6 +607,11 @@ function initializeVoice() {
 
 window.speakText = speakText;
 function speakText(text) {
+    if (!text || text.trim() === '') {
+        console.warn('⚠️ No text to speak');
+        return;
+    }
+
     if (synthesis.speaking) {
         synthesis.cancel();
     }
@@ -615,67 +620,146 @@ function speakText(text) {
     const langToUse = window.currentLanguage || currentLanguage;
     const voiceGenderSelect = document.getElementById('voiceGender');
     const preferredGender = voiceGenderSelect ? voiceGenderSelect.value : 'female';
-    
-    console.log(` Speaking with ${preferredGender.toUpperCase()} voice in ${langToUse}`);
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    console.log(`🔊 Speaking with ${preferredGender.toUpperCase()} voice in ${langToUse}`);
+    console.log(`📝 Text length: ${text.length} characters`);
+    console.log(`📄 Text preview: ${text.substring(0, 100)}...`);
+
+    // Clean and prepare text for better speech
+    let cleanText = text.trim();
+
+    // For Hindi/Urdu, ensure proper text encoding
+    if (langToUse.startsWith('hi') || langToUse.startsWith('ur')) {
+        // Remove excessive whitespace but keep structure
+        cleanText = cleanText.replace(/\s+/g, ' ');
+    }
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = langToUse;
-    utterance.rate = 0.9;
-    
+    utterance.rate = 0.85; // Slightly slower for better clarity
+    utterance.volume = 1.0; // Full volume
+
     // IMPORTANT: Different pitch for male/female
-    utterance.pitch = preferredGender === 'female' ? 1.4 : 0.7;
+    utterance.pitch = preferredGender === 'female' ? 1.2 : 0.8;
 
-    const voices = synthesis.getVoices();
-    const langCode = langToUse.split('-')[0];
-    
-    // Filter by language first
-    const langVoices = voices.filter(v => v.lang.startsWith(langCode));
-    console.log(`Found ${langVoices.length} voices for ${langCode}`);
-    
-    let selectedVoice = null;
-    
-    if (preferredGender === 'female') {
-        // FORCE FEMALE VOICE
-        selectedVoice = langVoices.find(v => 
-            v.name.includes('Female') || 
-            v.name.includes('female') ||
-            v.name.includes('Zira') ||
-            v.name.includes('Heera') ||
-            v.name.includes('Kalpana')
-        );
-        
-        if (!selectedVoice) {
-            // Exclude males
-            selectedVoice = langVoices.find(v => 
-                !v.name.includes('Male') && 
-                !v.name.includes('male') &&
-                !v.name.includes('David')
-            );
+    // Wait for voices to load if needed
+    let voices = synthesis.getVoices();
+    if (voices.length === 0) {
+        console.log('⏳ Waiting for voices to load...');
+        synthesis.addEventListener('voiceschanged', () => {
+            voices = synthesis.getVoices();
+            selectAndSpeak();
+        }, { once: true });
+        return;
+    }
+
+    selectAndSpeak();
+
+    function selectAndSpeak() {
+        const voices = synthesis.getVoices();
+        const langCode = langToUse.split('-')[0];
+
+        console.log(`🔍 Total available voices: ${voices.length}`);
+
+        // Filter by language - be more flexible with matching
+        let langVoices = voices.filter(v => {
+            const vLang = v.lang.toLowerCase();
+            const targetLang = langToUse.toLowerCase();
+            return vLang.startsWith(langCode) || vLang === targetLang || vLang.includes(langCode);
+        });
+
+        console.log(`✅ Found ${langVoices.length} voices for ${langCode}`);
+
+        // If no exact match, try broader search
+        if (langVoices.length === 0) {
+            console.log('⚠️ No exact language match, trying broader search...');
+            langVoices = voices.filter(v => v.lang.includes(langCode));
         }
-    } else {
-        // MALE VOICE
-        selectedVoice = langVoices.find(v => 
-            v.name.includes('Male') || 
-            v.name.includes('male') ||
-            v.name.includes('David')
-        );
-    }
-    
-    // Fallback
-    if (!selectedVoice && langVoices.length > 0) {
-        selectedVoice = langVoices[0];
-    }
-    
-    if (selectedVoice) {
-        utterance.voice = selectedVoice;
-        console.log(` Using: ${selectedVoice.name} (Pitch: ${utterance.pitch})`);
-    }
 
-    synthesis.speak(utterance);
+        // Log available voices for debugging
+        if (langVoices.length > 0) {
+            console.log('📢 Available voices:', langVoices.map(v => `${v.name} (${v.lang})`).join(', '));
+        }
 
-    if (text && text.length > 20) {
-        window.lastBillText = text;
-        console.log(' Bill text stored for replay');
+        let selectedVoice = null;
+
+        if (preferredGender === 'female') {
+            // FORCE FEMALE VOICE - Enhanced matching
+            selectedVoice = langVoices.find(v => {
+                const name = v.name.toLowerCase();
+                return name.includes('female') ||
+                    name.includes('zira') ||
+                    name.includes('heera') ||
+                    name.includes('kalpana') ||
+                    name.includes('swara') ||
+                    name.includes('hemant') === false; // Exclude male names
+            });
+
+            if (!selectedVoice) {
+                // Exclude known male voices
+                selectedVoice = langVoices.find(v => {
+                    const name = v.name.toLowerCase();
+                    return !name.includes('male') &&
+                        !name.includes('david') &&
+                        !name.includes('mark') &&
+                        !name.includes('hemant');
+                });
+            }
+        } else {
+            // MALE VOICE - Enhanced matching
+            selectedVoice = langVoices.find(v => {
+                const name = v.name.toLowerCase();
+                return name.includes('male') ||
+                    name.includes('david') ||
+                    name.includes('hemant');
+            });
+        }
+
+        // Fallback to first available voice for the language
+        if (!selectedVoice && langVoices.length > 0) {
+            selectedVoice = langVoices[0];
+            console.log('⚠️ Using fallback voice');
+        }
+
+        // Last resort: use any available voice
+        if (!selectedVoice && voices.length > 0) {
+            selectedVoice = voices[0];
+            console.log('⚠️ Using default system voice');
+        }
+
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            console.log(`🎤 Selected Voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+            console.log(`🎵 Pitch: ${utterance.pitch}, Rate: ${utterance.rate}`);
+        } else {
+            console.warn('⚠️ No voice selected, using browser default');
+        }
+
+        // Add event listeners for debugging
+        utterance.onstart = () => {
+            console.log('🔊 Speech started');
+        };
+
+        utterance.onend = () => {
+            console.log('✅ Speech completed');
+        };
+
+        utterance.onerror = (event) => {
+            console.error('❌ Speech error:', event.error);
+            if (event.error === 'interrupted') {
+                console.log('Speech was interrupted');
+            }
+        };
+
+        // Speak the text
+        synthesis.speak(utterance);
+        console.log('🚀 Speech synthesis started');
+
+        // Store for replay
+        if (cleanText && cleanText.length > 20) {
+            window.lastBillText = cleanText;
+            console.log('💾 Bill text stored for replay');
+        }
     }
 }
 
